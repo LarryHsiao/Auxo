@@ -1,5 +1,6 @@
 package com.larryhsiao.auxo;
 
+import com.larryhsiao.auxo.controller.FileInfo;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -18,8 +19,10 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/com/larryhsiao/auxo/tags.fxml"));
-        Scene scene = new Scene(root);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/file.fxml"));
+        Scene scene = new Scene(loader.load());
+        FileInfo control = loader.getController();
+        control.init(2);
         stage.setScene(scene);
         stage.show();
     }

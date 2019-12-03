@@ -1,6 +1,7 @@
 package com.larryhsiao.auxo.tagging;
 
 import com.silverhetch.clotho.Source;
+import com.silverhetch.clotho.source.ConstSource;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,14 +21,11 @@ public class QueriedAFiles implements Source<Map<String, AFile>> {
     @Override
     public Map<String, AFile> value() {
         try {
-            ResultSet res = resSource.value();
-            Map<String, AFile> result = new HashMap<>();
+            final ResultSet res = resSource.value();
+            final Map<String, AFile> result = new HashMap<>();
             while (res.next()) {
-                final String name = res.getString("name");
-                result.put(
-                    name,
-                    new ConstAFile(name)
-                );
+                final AFile file = new QueriedAFile(new ConstSource<>(res)).value();
+                result.put(file.name(), file);
             }
             return result;
         } catch (SQLException e) {
