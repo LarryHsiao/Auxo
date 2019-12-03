@@ -27,4 +27,14 @@ class FsFilesTest {
             new FsFiles(root).value().size()
         );
     }
+
+    @Test
+    void exceptionOnNotDirectory() {
+        try {
+            new FsFiles(File.createTempFile("temp", "")).value();
+            fail("Should throw exception.");
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+    }
 }

@@ -1,10 +1,8 @@
 package com.larryhsiao.auxo.workspace;
 
-import com.larryhsiao.auxo.tagging.AFile;
 import com.silverhetch.clotho.Source;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +25,10 @@ public class FsFiles implements Source<Map<String, File>> {
         File[] files = workspace.listFiles();
         if (files != null) {
             for (File file : files) {
-                result.put(file.getName(), file);
+                result.put(file.getName().replace(
+                    workspace.getAbsolutePath(), ""),
+                    file
+                );
             }
         }
         return result;
