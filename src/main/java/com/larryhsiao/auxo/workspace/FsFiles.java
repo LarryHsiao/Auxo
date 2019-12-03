@@ -36,10 +36,7 @@ public class FsFiles implements Source<Map<String, File>> {
             final StringComparator comparator = new StringComparator();
             fileList.sort((o1, o2) -> comparator.compare(o2.getName(), o1.getName()));
             for (File file : fileList) {
-                result.put(file.getName().replace(
-                    workspace.getAbsolutePath(), ""),
-                    file
-                );
+                result.put(file.getName(), file);
             }
         }
         return result;

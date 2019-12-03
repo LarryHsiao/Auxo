@@ -4,6 +4,7 @@ import com.larryhsiao.auxo.tagging.FakeDataConn;
 import com.larryhsiao.auxo.tagging.FileById;
 import com.larryhsiao.auxo.tagging.QueriedAFile;
 import com.larryhsiao.auxo.tagging.TagDbConn;
+import com.silverhetch.clotho.database.SingleConn;
 import com.silverhetch.clotho.database.sqlite.InMemoryConn;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -29,8 +30,8 @@ public class FileInfo implements Initializable {
         fileName.setText(
             new QueriedAFile(
                 new FileById(
-                    new FakeDataConn(
-                        new TagDbConn(new InMemoryConn())
+                    new SingleConn(
+                        new TagDbConn()
                     ),
                     fileId
                 )

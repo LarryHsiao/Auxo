@@ -17,9 +17,10 @@ public class QueriedAFile implements Source<AFile> {
 
     @Override
     public AFile value() {
-        try {
+        try (ResultSet res = resSource.value()){
             return new ConstAFile(
-                resSource.value().getString("name")
+                res.getLong("id"),
+                res.getString("name")
             );
         } catch (SQLException e) {
             throw new RuntimeException(e);

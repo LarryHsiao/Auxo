@@ -29,7 +29,7 @@ public class CreatedAFile implements Source<AFile> {
             stmt.execute();
             ResultSet idRes = stmt.getGeneratedKeys();
             if (idRes.next()) {
-                return new ConstAFile(fileName);
+                return new ConstAFile(idRes.getLong(1), fileName);
             }
             throw new SQLException("File insert failed: " + fileName);
         } catch (SQLException e) {

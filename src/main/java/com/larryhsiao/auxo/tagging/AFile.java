@@ -5,6 +5,10 @@ package com.larryhsiao.auxo.tagging;
  */
 public interface AFile {
     /**
+     * @return Id of this {@link AFile}
+     */
+    long id();
+    /**
      * The name of this file in workspace.
      */
     String name();
