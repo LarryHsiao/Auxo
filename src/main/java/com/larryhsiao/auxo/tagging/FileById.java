@@ -2,7 +2,10 @@ package com.larryhsiao.auxo.tagging;
 
 import com.silverhetch.clotho.Source;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Source to fetch all file entry in database.

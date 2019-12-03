@@ -1,6 +1,9 @@
 package com.larryhsiao.auxo.controller;
 
-import com.larryhsiao.auxo.tagging.*;
+import com.larryhsiao.auxo.tagging.FakeDataConn;
+import com.larryhsiao.auxo.tagging.FileById;
+import com.larryhsiao.auxo.tagging.QueriedAFile;
+import com.larryhsiao.auxo.tagging.TagDbConn;
 import com.silverhetch.clotho.database.sqlite.InMemoryConn;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
