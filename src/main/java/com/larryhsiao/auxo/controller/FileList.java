@@ -20,9 +20,7 @@ public class FileList implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        data.addAll(
-            new FsFiles().value().keySet()
-        );
+        data.addAll(new FsFiles().value().keySet());
         fileList.setItems(data);
     }
 }
