@@ -13,9 +13,13 @@ import java.util.ResourceBundle;
  * Controller to show File details.
  */
 public class FileInfo implements Initializable {
-    private long fileId;
+    private final long fileId;
     @FXML
     private Label fileName;
+
+    public FileInfo(long fileId) {
+        this.fileId = fileId;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -25,13 +29,9 @@ public class FileInfo implements Initializable {
                     new FakeDataConn(
                         new TagDbConn(new InMemoryConn())
                     ),
-                    2
+                    fileId
                 )
             ).value().name()
         );
-    }
-
-    public void init(long fileId) {
-        this.fileId = fileId;
     }
 }
