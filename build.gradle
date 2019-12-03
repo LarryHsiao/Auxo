@@ -9,6 +9,9 @@ version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    maven {
+        url  "https://dl.bintray.com/larryhsiao/Elizabeth"
+    }
 }
 mainClassName = "$moduleName/com.larryhsiao.auxo.Main"
 
@@ -24,6 +27,13 @@ jlink {
     }
 }
 
+test {
+    useJUnitPlatform{
+    }
+}
+
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation  'com.silverhetch:clotho:1.14.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
 }
