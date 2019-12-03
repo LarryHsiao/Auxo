@@ -4,5 +4,6 @@ module auxo {
     requires clotho;
     requires java.sql;
 
+    opens com.larryhsiao.auxo.controller to javafx.fxml;
     exports com.larryhsiao.auxo;
 }

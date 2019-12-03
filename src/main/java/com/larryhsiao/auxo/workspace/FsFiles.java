@@ -1,9 +1,13 @@
 package com.larryhsiao.auxo.workspace;
 
 import com.silverhetch.clotho.Source;
+import com.silverhetch.clotho.utility.comparator.StringComparator;
 
 import java.io.File;
-import java.util.HashMap;
+import java.nio.file.FileSystems;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,15 +20,22 @@ public class FsFiles implements Source<Map<String, File>> {
         this.workspace = workspace;
     }
 
+    public FsFiles() {
+        this.workspace = FileSystems.getDefault().getPath(".").toFile();
+    }
+
     @Override
     public Map<String, File> value() {
         if (!workspace.isDirectory()) {
-            throw new RuntimeException("The given workspace is not a directory.");
+            throw new RuntimeException("The given workspace is not a directory: " + workspace.getAbsolutePath());
         }
-        HashMap<String, File> result = new HashMap<>();
-        File[] files = workspace.listFiles();
+        final LinkedHashMap<String, File> result = new LinkedHashMap<>();
+        final File[] files = workspace.listFiles();
         if (files != null) {
-            for (File file : files) {
+            List<File> fileList = Arrays.asList(files);
+            final StringComparator comparator = new StringComparator();
+            fileList.sort((o1, o2) -> comparator.compare(o2.getName(), o1.getName()));
+            for (File file : fileList) {
                 result.put(file.getName().replace(
                     workspace.getAbsolutePath(), ""),
                     file
