@@ -20,11 +20,10 @@ public class QueriedAFiles implements Source<Map<String, AFile>> {
 
     @Override
     public Map<String, AFile> value() {
-        try {
-            final ResultSet res = resSource.value();
+        try (final ResultSet res = resSource.value()){
             final Map<String, AFile> result = new HashMap<>();
             while (res.next()) {
-                final AFile file = new QueriedAFile(new ConstSource<>(res)).value();
+                final AFile file = new QueriedAFile(new ConstSource<>(res), false).value();
                 result.put(file.name(), file);
             }
             return result;

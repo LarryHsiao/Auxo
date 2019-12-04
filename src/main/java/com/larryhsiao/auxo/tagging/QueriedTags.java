@@ -19,8 +19,7 @@ public class QueriedTags implements Source<Map<String, Tag>> {
 
     @Override
     public Map<String, Tag> value() {
-        try {
-            ResultSet res = resSource.value();
+        try (ResultSet res = resSource.value()) {
             Map<String, Tag> result = new HashMap<>();
             while (res.next()) {
                 final String name = res.getString("name");

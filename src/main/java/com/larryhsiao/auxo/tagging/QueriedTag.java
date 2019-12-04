@@ -10,18 +10,29 @@ import java.sql.SQLException;
  */
 public class QueriedTag implements Source<Tag> {
     private final Source<ResultSet> resSrc;
+    private final boolean autoClose;
 
     public QueriedTag(Source<ResultSet> resSrc) {
+        this(resSrc, true);
+    }
+
+    public QueriedTag(Source<ResultSet> resSrc, boolean autoClose) {
         this.resSrc = resSrc;
+        this.autoClose = autoClose;
     }
 
     @Override
     public Tag value() {
-        try (ResultSet res = resSrc.value()) {
-            return new ConstTag(
+        try {
+            final ResultSet res = resSrc.value();
+            Tag tag = new ConstTag(
                 res.getLong("id"),
                 res.getString("name")
             );
+            if (autoClose) {
+                res.close();
+            }
+            return tag;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
