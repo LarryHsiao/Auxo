@@ -1,6 +1,7 @@
 package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.tagging.*;
+import com.larryhsiao.auxo.utils.Execute;
 import com.larryhsiao.auxo.workspace.FsFiles;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.SingleConn;
@@ -14,6 +15,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -49,24 +51,14 @@ public class FileList implements Initializable {
         fileList.setItems(data);
         fileList.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
-                try {
-                    final FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/file.fxml"));
-                    loader.setController(new FileInfo(
-                            new FileByName(
-                                new SingleConn(new TagDbConn()),
-                                fileList.getSelectionModel().getSelectedItem()
-                            ).value().id()
-                        )
-                    );
-                    Stage current = ((Stage) fileList.getScene().getWindow());
-                    Stage newStage = new Stage();
-                    newStage.setScene(new Scene(loader.load()));
-                    newStage.setX(current.getX() + 50);
-                    newStage.setY(current.getY() + 50);
-                    newStage.show();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        new Execute(
+                            new File(fileList.getSelectionModel().getSelectedItem())
+                        ).fire();
+                    }
+                }).start();
             }
         });
     }
