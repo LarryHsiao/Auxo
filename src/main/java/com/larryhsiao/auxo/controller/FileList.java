@@ -45,9 +45,12 @@ public class FileList implements Initializable {
                             ).value().id()
                         )
                     );
-                    Stage stage = new Stage();
-                    stage.setScene(new Scene(loader.load()));
-                    stage.show();
+                    Stage current = ((Stage) fileList.getScene().getWindow());
+                    Stage newStage = new Stage();
+                    newStage.setScene(new Scene(loader.load()));
+                    newStage.setX(current.getX() + 50);
+                    newStage.setY(current.getY() + 50);
+                    newStage.show();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
