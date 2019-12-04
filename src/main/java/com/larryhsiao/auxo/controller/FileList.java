@@ -11,14 +11,19 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -31,9 +36,9 @@ import static javafx.scene.input.MouseButton.PRIMARY;
  */
 public class FileList implements Initializable {
     private final Source<Connection> db = new SingleConn(new TagDbConn());
-    private final ObservableList<String> data = FXCollections.observableArrayList();
+    private final ObservableList<File> data = FXCollections.observableArrayList();
     @FXML private TextField searchInput;
-    @FXML private ListView<String> fileList;
+    @FXML private ListView<File> fileList;
     @FXML private AnchorPane info;
 
     @Override
@@ -46,13 +51,41 @@ public class FileList implements Initializable {
                 new FsFiles().value().entrySet().stream()
                     .filter(entry -> entry.getKey().contains(keyword) ||
                         dbSearchRes.containsKey(entry.getKey()))
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)).keySet()
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)).values()
             );
         });
-        data.addAll(new FsFiles().value().keySet());
+        data.addAll(new FsFiles().value().values());
+        fileList.setCellFactory(new Callback<ListView<File>, ListCell<File>>() {
+            @Override
+            public ListCell<File> call(ListView<File> param) {
+                return new ListCell<>() {
+                    @Override
+                    protected void updateItem(File item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (!empty ) {
+                            setText(item.getName());
+                            loadImage(item);
+                        }
+                    }
+
+                    private void loadImage(File item) {
+                        try {
+                            if ("image/png".equals(Files.probeContentType(item.toPath()))) {
+                                final ImageView imageView = new ImageView(item.toURI().toASCIIString());
+                                imageView.setPreserveRatio(true);
+                                imageView.setFitHeight(75);
+                                setGraphic(imageView);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+            }
+        });
         fileList.setItems(data);
         fileList.setOnMouseClicked(event -> {
-            final File selectedFile = new File(fileList.getSelectionModel().getSelectedItem());
+            final File selectedFile = fileList.getSelectionModel().getSelectedItem();
             loadInfo(selectedFile);
             if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
                 new Thread(() -> new Execute(selectedFile).fire()).start();
