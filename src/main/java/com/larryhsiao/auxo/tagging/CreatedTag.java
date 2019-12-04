@@ -29,7 +29,7 @@ public class CreatedTag implements Source<Tag> {
             stmt.execute();
             final ResultSet idRes = stmt.getGeneratedKeys();
             if (idRes.next()) {
-                return new ConstTag(idRes.getInt(1), tagName);
+                return new ConstTag(idRes.getLong(1), tagName);
             }
             throw new SQLException("Insert failed.");
         } catch (SQLException e) {

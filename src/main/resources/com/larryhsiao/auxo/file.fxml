@@ -7,5 +7,6 @@
     prefHeight="400.0"
     prefWidth="600.0">
     <Label fx:id="fileName" />
+    <TextField fx:id="newTagInput" />
     <ListView fx:id="tagList" />
 </VBox>
