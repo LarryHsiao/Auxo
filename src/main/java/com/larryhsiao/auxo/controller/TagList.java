@@ -21,11 +21,17 @@ import java.util.ResourceBundle;
 public class TagList implements Initializable {
     private final Source<Connection> tag = new TagDbConn();
     private final ObservableList<Tag> data = FXCollections.observableArrayList();
-    @FXML
-    private ListView<Tag> tagList;
+    @FXML private TextField newTagInput;
+    @FXML private ListView<Tag> tagList;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        newTagInput.setOnAction(event -> {
+            tagList.getItems().add(
+                new CreatedTag(tag, newTagInput.getText()).value()
+            );
+            newTagInput.setText("");
+        });
         data.addAll(new QueriedTags(new AllTags(tag)).value().values());
         tagList.setCellFactory(new Callback<ListView<Tag>, ListCell<Tag>>() {
             @Override

@@ -84,12 +84,9 @@ public class FileList implements Initializable {
                 };
             }
         });
-        fileList.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
-            @Override
-            public void handle(ContextMenuEvent event) {
-                final ContextMenu menu = new ContextMenu();
-                menu.show(fileList, event.getScreenX(), event.getScreenY());
-            }
+        fileList.setOnContextMenuRequested(event -> {
+            final ContextMenu menu = new ContextMenu();
+            menu.show(fileList, event.getScreenX(), event.getScreenY());
         });
         fileList.setItems(data);
         fileList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<File>() {
