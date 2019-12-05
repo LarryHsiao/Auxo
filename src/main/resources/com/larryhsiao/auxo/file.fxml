@@ -3,8 +3,9 @@
 <?import java.lang.*?><?import java.util.*?><?import javafx.scene.*?><?import javafx.scene.control.*?><?import javafx.scene.layout.*?>
 
 <VBox xmlns="http://javafx.com/javafx"
+    maxWidth="250"
     xmlns:fx="http://javafx.com/fxml">
-    <Label fx:id="fileName" />
-    <TextField fx:id="newTagInput" />
+    <Label fx:id="fileName"   wrapText="true" />
+    <TextField fx:id="newTagInput"/>
     <ListView fx:id="tagList" />
 </VBox>
