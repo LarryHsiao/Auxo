@@ -5,6 +5,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.ResourceBundle;
+
 /**
  * Entry point of Auxo.
  */
@@ -15,7 +17,11 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/file_list.fxml"));
+        FXMLLoader loader = new FXMLLoader(
+            getClass().getResource("/com/larryhsiao/auxo/file_list.fxml"),
+//            getClass().getResource("/com/larryhsiao/auxo/tags.fxml"),
+            ResourceBundle.getBundle("i18n/default")
+        );
         Scene scene = new Scene(loader.load());
         stage.setMinWidth(640);
         stage.setMinHeight(480);

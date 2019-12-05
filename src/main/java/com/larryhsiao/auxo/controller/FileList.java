@@ -5,16 +5,15 @@ import com.larryhsiao.auxo.utils.Execute;
 import com.larryhsiao.auxo.workspace.FsFiles;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.SingleConn;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.AnchorPane;
@@ -93,12 +92,20 @@ public class FileList implements Initializable {
             }
         });
         fileList.setItems(data);
+        fileList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<File>() {
+            @Override
+            public void changed(ObservableValue<? extends File> observable, File oldValue, File newValue) {
+                if (newValue == null) {
+                    return;
+                }
+                loadInfo(newValue);
+            }
+        });
         fileList.setOnMouseClicked(event -> {
             final File selectedFile = fileList.getSelectionModel().getSelectedItem();
             if (selectedFile == null) {
                 return;
             }
-            loadInfo(selectedFile);
             if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
                 new Thread(() -> new Execute(selectedFile).fire()).start();
             }
