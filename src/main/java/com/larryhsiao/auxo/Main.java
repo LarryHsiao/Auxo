@@ -18,8 +18,8 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(
-//            getClass().getResource("/com/larryhsiao/auxo/file_list.fxml"),
-            getClass().getResource("/com/larryhsiao/auxo/tags.fxml"),
+            getClass().getResource("/com/larryhsiao/auxo/file_list.fxml"),
+//            getClass().getResource("/com/larryhsiao/auxo/tags.fxml"),
             ResourceBundle.getBundle("i18n/default")
         );
         Scene scene = new Scene(loader.load());

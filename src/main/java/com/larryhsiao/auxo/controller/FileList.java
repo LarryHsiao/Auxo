@@ -95,7 +95,7 @@ public class FileList implements Initializable {
                 if (newValue == null) {
                     return;
                 }
-                loadInfo(newValue);
+                loadInfo(newValue, resources);
             }
         });
         fileList.setOnMouseClicked(event -> {
@@ -109,9 +109,9 @@ public class FileList implements Initializable {
         });
     }
 
-    private void loadInfo(File selected) {
+    private void loadInfo(File selected, ResourceBundle res) {
         try {
-            final FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/file.fxml"));
+            final FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/file.fxml"), res);
             loader.setController(new FileInfo(
                     new FileByName(
                         new SingleConn(new TagDbConn()),
