@@ -5,8 +5,6 @@
 <VBox xmlns="http://javafx.com/javafx"
     xmlns:fx="http://javafx.com/fxml"
     fx:controller="com.larryhsiao.auxo.controller.TagList">
-    <TextField fx:id="newTagInput"/>
-    <ListView fx:id="tagList"
-        prefHeight="400.0"
-        prefWidth="600.0" />
+    <TextField fx:id="newTagInput" />
+    <ListView fx:id="tagList" />
 </VBox>
