@@ -1,5 +1,6 @@
 package com.larryhsiao.auxo.controller;
 
+import com.larryhsiao.auxo.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.tagging.*;
 import com.larryhsiao.auxo.utils.Execute;
 import com.larryhsiao.auxo.workspace.FsFiles;
@@ -13,10 +14,12 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.io.File;
@@ -64,7 +67,7 @@ public class FileList implements Initializable {
                         if (!empty) {
                             setText(item.getName());
                             loadImage(item);
-                        }else {
+                        } else {
                             setText("");
                         }
                     }
@@ -106,9 +109,26 @@ public class FileList implements Initializable {
                 return;
             }
             if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
-                new Thread(() -> new Execute(selectedFile).fire()).start();
+                if (selectedFile.isDirectory()) {
+                    fileBrowse(selectedFile, resources);
+                } else {
+                    new Thread(() -> new Execute(selectedFile).fire()).start();
+                }
             }
         });
+    }
+
+    private void fileBrowse(File selected, ResourceBundle res) {
+        try {
+            final FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/file_browse.fxml"), res);
+            loader.setController(new FileBrowse(selected));
+            Stage stage = new Stage();
+            stage.setTitle(selected.getName());
+            stage.setScene(new Scene(loader.load()));
+            stage.show();
+        } catch (Exception e) {
+            new ExceptionAlert(e, res).fire();
+        }
     }
 
     private void loadInfo(File selected, ResourceBundle res) {
