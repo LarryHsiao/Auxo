@@ -23,8 +23,8 @@ public class Main extends Application {
             ResourceBundle.getBundle("i18n/default")
         );
         Scene scene = new Scene(loader.load());
-        stage.setMinWidth(640);
-        stage.setMinHeight(480);
+        stage.setMinWidth(1280);
+        stage.setMinHeight(720);
         stage.setScene(scene);
         stage.show();
     }

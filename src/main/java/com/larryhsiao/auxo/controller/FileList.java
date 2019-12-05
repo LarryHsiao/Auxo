@@ -64,6 +64,8 @@ public class FileList implements Initializable {
                         if (!empty) {
                             setText(item.getName());
                             loadImage(item);
+                        }else {
+                            setText("");
                         }
                     }
 
@@ -114,7 +116,7 @@ public class FileList implements Initializable {
             final FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/file.fxml"), res);
             loader.setController(new FileInfo(
                     new FileByName(
-                        new SingleConn(new TagDbConn()),
+                        db,
                         selected.getName()
                     ).value().id()
                 )
