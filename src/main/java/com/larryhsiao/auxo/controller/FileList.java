@@ -86,6 +86,9 @@ public class FileList implements Initializable {
         fileList.setItems(data);
         fileList.setOnMouseClicked(event -> {
             final File selectedFile = fileList.getSelectionModel().getSelectedItem();
+            if (selectedFile==null){
+                return;
+            }
             loadInfo(selectedFile);
             if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
                 new Thread(() -> new Execute(selectedFile).fire()).start();
