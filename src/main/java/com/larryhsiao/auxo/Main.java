@@ -17,6 +17,8 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/file_list.fxml"));
         Scene scene = new Scene(loader.load());
+        stage.setMinWidth(640);
+        stage.setMinHeight(480);
         stage.setScene(scene);
         stage.show();
     }

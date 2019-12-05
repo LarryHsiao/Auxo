@@ -7,17 +7,17 @@ import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.SingleConn;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.io.File;
@@ -55,14 +55,14 @@ public class FileList implements Initializable {
             );
         });
         data.addAll(new FsFiles().value().values());
-        fileList.setCellFactory(new Callback<ListView<File>, ListCell<File>>() {
+        fileList.setCellFactory(new Callback<>() {
             @Override
             public ListCell<File> call(ListView<File> param) {
                 return new ListCell<>() {
                     @Override
                     protected void updateItem(File item, boolean empty) {
                         super.updateItem(item, empty);
-                        if (!empty ) {
+                        if (!empty) {
                             setText(item.getName());
                             loadImage(item);
                         }
@@ -70,10 +70,12 @@ public class FileList implements Initializable {
 
                     private void loadImage(File item) {
                         try {
-                            if ("image/png".equals(Files.probeContentType(item.toPath()))) {
+                            if ("image/png".equals(Files.probeContentType(item.toPath())) ||
+                                "image/jpeg".equals(Files.probeContentType(item.toPath()))) {
                                 final ImageView imageView = new ImageView(item.toURI().toASCIIString());
                                 imageView.setPreserveRatio(true);
                                 imageView.setFitHeight(75);
+                                imageView.setFitWidth(75);
                                 setGraphic(imageView);
                             }
                         } catch (IOException e) {
@@ -83,10 +85,17 @@ public class FileList implements Initializable {
                 };
             }
         });
+        fileList.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+            @Override
+            public void handle(ContextMenuEvent event) {
+                final ContextMenu menu = new ContextMenu();
+                menu.show(fileList, event.getScreenX(), event.getScreenY());
+            }
+        });
         fileList.setItems(data);
         fileList.setOnMouseClicked(event -> {
             final File selectedFile = fileList.getSelectionModel().getSelectedItem();
-            if (selectedFile==null){
+            if (selectedFile == null) {
                 return;
             }
             loadInfo(selectedFile);
