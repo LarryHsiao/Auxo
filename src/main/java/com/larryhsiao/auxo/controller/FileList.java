@@ -6,6 +6,7 @@ import com.larryhsiao.auxo.utils.Execute;
 import com.larryhsiao.auxo.workspace.FsFiles;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.SingleConn;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -112,7 +113,13 @@ public class FileList implements Initializable {
                 if (selectedFile.isDirectory()) {
                     fileBrowse(selectedFile, resources);
                 } else {
-                    new Thread(() -> new Execute(selectedFile).fire()).start();
+                    new Thread(() -> {
+                        try {
+                            new Execute(selectedFile).fire();
+                        } catch (Exception e) {
+                            Platform.runLater(() -> new ExceptionAlert(e, resources).fire());
+                        }
+                    }).start();
                 }
             }
         });
