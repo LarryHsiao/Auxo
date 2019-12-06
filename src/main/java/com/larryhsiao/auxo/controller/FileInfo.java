@@ -11,9 +11,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.controlsfx.control.textfield.TextFields;
 
 import java.net.URL;
 import java.sql.Connection;
+import java.util.Collection;
 import java.util.ResourceBundle;
 
 /**
@@ -74,6 +78,21 @@ public class FileInfo implements Initializable {
                 new FileById(db, fileId)
             ).value().name()
         );
+        TextFields.bindAutoCompletion(newTagInput, param -> new QueriedTags(
+            new TagsByKeyword(
+                db, param.getUserText()
+            )
+        ).value().values(), new StringConverter<Tag>() {
+            @Override
+            public String toString(Tag object) {
+                return object.name();
+            }
+
+            @Override
+            public Tag fromString(String string) {
+                return new TagByName(db,string).value();
+            }
+        });
     }
 
     private ContextMenu tagContextMenu(ResourceBundle resource) {
