@@ -147,6 +147,14 @@ public class FileList implements Initializable {
             newStage.setScene(new Scene(loader.load()));
             newStage.setX(currentStage.getX() + 100);
             newStage.setY(currentStage.getY() + 100);
+            newStage.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent event) {
+                    if (event.getCode() == KeyCode.ESCAPE) {
+                        newStage.close();
+                    }
+                }
+            });
             newStage.show();
         } catch (Exception e) {
             new ExceptionAlert(e, res).fire();
