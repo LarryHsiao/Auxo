@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.net.URL;
@@ -58,11 +59,14 @@ public class TagList implements Initializable {
         MenuItem delete = new MenuItem();
         delete.setText(resources.getString("delete"));
         delete.setOnAction(event -> {
+            final Stage current = ((Stage) tagList.getScene().getWindow());
             final Tag selected = tagList.getSelectionModel().getSelectedItem();
             final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle(selected.name());
             alert.setContentText(MessageFormat.format(resources.getString("delete_obj"), selected.name()));
             alert.setHeaderText(resources.getString("are_you_sure"));
+            alert.setX(current.getX() + 150);
+            alert.setY(current.getY() + 150);
             final Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 new TagDeletionById(tag, selected.id()).fire();

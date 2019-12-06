@@ -73,6 +73,7 @@ public class FileList implements Initializable {
                             loadImage(item);
                         } else {
                             setText("");
+                            setGraphic(null);
                         }
                     }
 
