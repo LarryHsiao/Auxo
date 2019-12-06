@@ -4,8 +4,12 @@
 
 <VBox xmlns="http://javafx.com/javafx"
     maxWidth="250"
+    AnchorPane.topAnchor="0.0"
+    AnchorPane.bottomAnchor="0.0"
+    AnchorPane.leftAnchor="0.0"
+    AnchorPane.rightAnchor="0.0"
     xmlns:fx="http://javafx.com/fxml">
     <Label fx:id="fileName"   wrapText="true" />
     <TextField fx:id="newTagInput"/>
-    <ListView fx:id="tagList" />
+    <ListView fx:id="tagList" VBox.vgrow="ALWAYS" />
 </VBox>
