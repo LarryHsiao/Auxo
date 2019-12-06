@@ -139,12 +139,15 @@ public class FileList implements Initializable {
 
     private void fileBrowse(File selected, ResourceBundle res) {
         try {
+            final Stage currentStage = ((Stage) fileList.getScene().getWindow());
             final FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/file_browse.fxml"), res);
             loader.setController(new FileBrowse(selected));
-            Stage stage = new Stage();
-            stage.setTitle(selected.getName());
-            stage.setScene(new Scene(loader.load()));
-            stage.show();
+            final Stage newStage = new Stage();
+            newStage.setTitle(selected.getName());
+            newStage.setScene(new Scene(loader.load()));
+            newStage.setX(currentStage.getX() + 100);
+            newStage.setY(currentStage.getY() + 100);
+            newStage.show();
         } catch (Exception e) {
             new ExceptionAlert(e, res).fire();
         }
