@@ -36,6 +36,9 @@ public class FsFiles implements Source<Map<String, File>> {
             final StringComparator comparator = new StringComparator();
             fileList.sort((o1, o2) -> comparator.compare(o2.getName(), o1.getName()));
             for (File file : fileList) {
+                if (".auxo.db".equals(file.getName())){
+                    continue;
+                }
                 result.put(file.getName(), file);
             }
         }

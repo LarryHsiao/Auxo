@@ -21,7 +21,7 @@ public class TagDbConn implements Source<Connection> {
 
     public TagDbConn() {
         this.connSource = new SQLiteConn(
-            FileSystems.getDefault().getPath("auxo.db").toFile().getName()
+            FileSystems.getDefault().getPath(".auxo.db").toFile().getName()
         );
     }
 
