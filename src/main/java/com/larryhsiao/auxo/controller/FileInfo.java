@@ -1,6 +1,7 @@
 package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.tagging.*;
+import com.larryhsiao.auxo.views.TagListCell;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.SingleConn;
 import javafx.collections.FXCollections;
@@ -56,22 +57,7 @@ public class FileInfo implements Initializable {
             ).value().values()
         );
         tagList.setItems(tags);
-        tagList.setCellFactory(new Callback<ListView<Tag>, ListCell<Tag>>() {
-            @Override
-            public ListCell<Tag> call(ListView<Tag> param) {
-                return new ListCell<>() {
-                    @Override
-                    protected void updateItem(Tag item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setText("");
-                        } else {
-                            setText(item.name());
-                        }
-                    }
-                };
-            }
-        });
+        tagList.setCellFactory(param -> new TagListCell());
         tagList.setContextMenu(tagContextMenu(resources));
         fileName.setText(
             new QueriedAFile(
@@ -90,7 +76,7 @@ public class FileInfo implements Initializable {
 
             @Override
             public Tag fromString(String string) {
-                return new TagByName(db,string).value();
+                return new TagByName(db, string).value();
             }
         });
     }

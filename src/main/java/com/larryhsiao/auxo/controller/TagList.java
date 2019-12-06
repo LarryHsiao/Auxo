@@ -1,12 +1,15 @@
 package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.tagging.*;
+import com.larryhsiao.auxo.views.TagListCell;
 import com.silverhetch.clotho.Source;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -34,22 +37,7 @@ public class TagList implements Initializable {
             newTagInput.setText("");
         });
         data.addAll(new QueriedTags(new AllTags(tag)).value().values());
-        tagList.setCellFactory(new Callback<ListView<Tag>, ListCell<Tag>>() {
-            @Override
-            public ListCell<Tag> call(ListView<Tag> param) {
-                return new ListCell<>() {
-                    @Override
-                    protected void updateItem(Tag item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (!empty) {
-                            setText(item.name());
-                        } else {
-                            setText("");
-                        }
-                    }
-                };
-            }
-        });
+        tagList.setCellFactory(param -> new TagListCell());
         tagList.setItems(data);
         tagList.setContextMenu(contextMenu(resources));
     }
