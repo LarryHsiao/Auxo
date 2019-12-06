@@ -2,9 +2,12 @@
 
 <?import java.lang.*?><?import java.util.*?><?import javafx.scene.*?><?import javafx.scene.control.*?><?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx"
+<HBox xmlns="http://javafx.com/javafx"
     xmlns:fx="http://javafx.com/fxml"
     fx:controller="com.larryhsiao.auxo.controller.TagList">
-    <TextField fx:id="newTagInput" />
-    <ListView fx:id="tagList" />
-</VBox>
+    <VBox>
+        <TextField fx:id="newTagInput" />
+        <ListView fx:id="tagList" />
+    </VBox>
+    <AnchorPane fx:id="files" />
+</HBox>

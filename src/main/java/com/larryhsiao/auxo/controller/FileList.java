@@ -3,6 +3,7 @@ package com.larryhsiao.auxo.controller;
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.tagging.*;
 import com.larryhsiao.auxo.utils.Execute;
+import com.larryhsiao.auxo.utils.FileOpening;
 import com.larryhsiao.auxo.views.FileListCell;
 import com.larryhsiao.auxo.workspace.FsFiles;
 import com.silverhetch.clotho.Source;
@@ -82,56 +83,22 @@ public class FileList implements Initializable {
         });
         fileList.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
-                openSelectedFile(resources);
+                new FileOpening(
+                    ((Stage) fileList.getScene().getWindow()),
+                    fileList.getSelectionModel().getSelectedItem(),
+                    resources
+                ).fire();
             }
         });
         fileList.setOnKeyPressed(event -> {
             if (event.getCode() == ENTER) {
-                openSelectedFile(resources);
+                new FileOpening(
+                    ((Stage) fileList.getScene().getWindow()),
+                    fileList.getSelectionModel().getSelectedItem(),
+                    resources
+                ).fire();
             }
         });
-    }
-
-    private void openSelectedFile(ResourceBundle res) {
-        final File selectedFile = fileList.getSelectionModel().getSelectedItem();
-        if (selectedFile == null) {
-            return;
-        }
-        if (selectedFile.isDirectory()) {
-            fileBrowse(selectedFile, res);
-        } else {
-            new Thread(() -> {
-                try {
-                    new Execute(selectedFile).fire();
-                } catch (Exception e) {
-                    Platform.runLater(() -> new ExceptionAlert(e, res).fire());
-                }
-            }).start();
-        }
-    }
-
-    private void fileBrowse(File selected, ResourceBundle res) {
-        try {
-            final Stage currentStage = ((Stage) fileList.getScene().getWindow());
-            final FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/file_browse.fxml"), res);
-            loader.setController(new FileBrowse(selected));
-            final Stage newStage = new Stage();
-            newStage.setTitle(selected.getName());
-            newStage.setScene(new Scene(loader.load()));
-            newStage.setX(currentStage.getX() + 100);
-            newStage.setY(currentStage.getY() + 100);
-            newStage.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
-                @Override
-                public void handle(KeyEvent event) {
-                    if (event.getCode() == KeyCode.ESCAPE) {
-                        newStage.close();
-                    }
-                }
-            });
-            newStage.show();
-        } catch (Exception e) {
-            new ExceptionAlert(e, res).fire();
-        }
     }
 
     private void loadInfo(File selected, ResourceBundle res) {
