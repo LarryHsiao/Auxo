@@ -2,6 +2,7 @@ package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.utils.Execute;
+import com.larryhsiao.auxo.views.FileListCell;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -42,22 +43,7 @@ public class FileBrowse implements Initializable {
                 openSelectedFile(resources);
             }
         });
-        listView.setCellFactory(new Callback<>() {
-            @Override
-            public ListCell<File> call(ListView<File> param) {
-                return new ListCell<>() {
-                    @Override
-                    protected void updateItem(File item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setText("");
-                        } else {
-                            setText(item.getName());
-                        }
-                    }
-                };
-            }
-        });
+        listView.setCellFactory(param -> new FileListCell());
 
         listView.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {

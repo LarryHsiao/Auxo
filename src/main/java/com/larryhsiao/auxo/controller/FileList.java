@@ -3,6 +3,7 @@ package com.larryhsiao.auxo.controller;
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.tagging.*;
 import com.larryhsiao.auxo.utils.Execute;
+import com.larryhsiao.auxo.views.FileListCell;
 import com.larryhsiao.auxo.workspace.FsFiles;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.SingleConn;
@@ -15,6 +16,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -23,6 +25,7 @@ import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -62,47 +65,7 @@ public class FileList implements Initializable {
             );
         });
         data.addAll(new FsFiles().value().values());
-        fileList.setCellFactory(new Callback<>() {
-            @Override
-            public ListCell<File> call(ListView<File> param) {
-                return new ListCell<>() {
-                    @Override
-                    protected void updateItem(File item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setText("");
-                            setGraphic(null);
-                        } else {
-                            setText(item.getName());
-                            loadImage(item);
-                        }
-                    }
-
-                    private void loadImage(File item) {
-                        try {
-                            if ("image/png".equals(Files.probeContentType(item.toPath())) ||
-                                "image/jpeg".equals(Files.probeContentType(item.toPath()))) {
-                                final ImageView imageView = new ImageView(new Image(
-                                    item.toURI().toASCIIString(),
-                                    75,
-                                    75,
-                                    true,
-                                    true,
-                                    true));
-                                imageView.setPreserveRatio(true);
-                                imageView.setFitHeight(75);
-                                imageView.setFitWidth(75);
-                                setGraphic(imageView);
-                            } else {
-                                setGraphic(null);
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                };
-            }
-        });
+        fileList.setCellFactory(param -> new FileListCell());
         fileList.setOnContextMenuRequested(event -> {
             final ContextMenu menu = new ContextMenu();
             menu.show(fileList, event.getScreenX(), event.getScreenY());
