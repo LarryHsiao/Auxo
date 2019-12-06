@@ -32,13 +32,15 @@ public class FileListCell extends ListCell<File> {
             if ("image/png".equals(Files.probeContentType(item.toPath())) ||
                 "image/jpeg".equals(Files.probeContentType(item.toPath()))) {
                 imageUrl = item.toURI().toASCIIString();
-            } else if (item.isDirectory()) {
+            } else if ("..".equals(item.getName())) {
+                imageUrl = getClass().getResource("/images/back.png").toString();
+            }else if (item.isDirectory()) {
                 imageUrl = getClass().getResource("/images/dir.png").toString();
-            } else {
+            }  else {
                 imageUrl = getClass().getResource("/images/file.png").toString();
             }
             final StackPane container = new StackPane();
-            container.setPrefSize(100,100);
+            container.setPrefSize(100, 100);
             final ImageView imageView = new ImageView(
                 new Image(
                     imageUrl,
