@@ -17,6 +17,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyCode;
@@ -68,12 +69,12 @@ public class FileList implements Initializable {
                     @Override
                     protected void updateItem(File item, boolean empty) {
                         super.updateItem(item, empty);
-                        if (!empty) {
-                            setText(item.getName());
-                            loadImage(item);
-                        } else {
+                        if (empty) {
                             setText("");
                             setGraphic(null);
+                        } else {
+                            setText(item.getName());
+                            loadImage(item);
                         }
                     }
 
@@ -81,11 +82,19 @@ public class FileList implements Initializable {
                         try {
                             if ("image/png".equals(Files.probeContentType(item.toPath())) ||
                                 "image/jpeg".equals(Files.probeContentType(item.toPath()))) {
-                                final ImageView imageView = new ImageView(item.toURI().toASCIIString());
+                                final ImageView imageView = new ImageView(new Image(
+                                    item.toURI().toASCIIString(),
+                                    75,
+                                    75,
+                                    true,
+                                    true,
+                                    true));
                                 imageView.setPreserveRatio(true);
                                 imageView.setFitHeight(75);
                                 imageView.setFitWidth(75);
                                 setGraphic(imageView);
+                            } else {
+                                setGraphic(null);
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
