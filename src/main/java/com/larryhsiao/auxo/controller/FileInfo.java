@@ -1,5 +1,6 @@
 package com.larryhsiao.auxo.controller;
 
+import com.larryhsiao.auxo.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.tagging.*;
 import com.larryhsiao.auxo.views.TagListCell;
 import com.silverhetch.clotho.Source;
@@ -9,14 +10,24 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.TextFields;
 
+import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
 import java.util.ResourceBundle;
+
+import static javafx.scene.input.MouseButton.PRIMARY;
 
 /**
  * Controller to show File details.
@@ -61,6 +72,19 @@ public class FileInfo implements Initializable {
                 new FileById(db, fileId)
             ).value().name()
         );
+        tagList.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
+                    final Tag selected = tagList.getSelectionModel().getSelectedItem();
+                    try {
+                        openTagFileDialog(selected);
+                    }catch (IOException e){
+                        new ExceptionAlert(e, resources).fire();
+                    }
+                }
+            }
+        });
         TextFields.bindAutoCompletion(newTagInput, param -> new QueriedTags(
             new TagsByKeyword(
                 db, param.getUserText()
@@ -76,6 +100,29 @@ public class FileInfo implements Initializable {
                 return new TagByName(db, string).value();
             }
         });
+    }
+
+    private void openTagFileDialog(Tag selected) throws IOException {
+        final Stage currentStage = ((Stage) tagList.getScene().getWindow());
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/tag_files.fxml"));
+        loader.setController(new TagFiles(
+            selected.id())
+        );
+        final Stage newStage = new Stage();
+        newStage.setMinHeight(720);
+        newStage.setTitle(selected.name());
+        newStage.setScene(new Scene(loader.load()));
+        newStage.setX(currentStage.getX() + 100);
+        newStage.setY(currentStage.getY() + 100);
+        newStage.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode() == KeyCode.ESCAPE) {
+                    newStage.close();
+                }
+            }
+        });
+        newStage.show();
     }
 
     private ContextMenu tagContextMenu(ResourceBundle resource) {
