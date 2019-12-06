@@ -1,8 +1,10 @@
 package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
+import com.larryhsiao.auxo.utils.FileComparator;
 import com.larryhsiao.auxo.utils.PlatformExecute;
 import com.larryhsiao.auxo.views.FileListCell;
+import com.silverhetch.clotho.utility.comparator.StringComparator;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -12,6 +14,9 @@ import javafx.scene.input.KeyCode;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import static javafx.scene.input.MouseButton.PRIMARY;
@@ -65,7 +70,13 @@ public class FileBrowse implements Initializable {
             if (!dir.getCanonicalPath().equals(target.getCanonicalPath())) {
                 listView.getItems().add(new File(dir, ".."));
             }
-            listView.getItems().addAll(dir.listFiles());
+            final File[] children = dir.listFiles();
+            if (children == null) {
+                return;
+            }
+            List<File> files = Arrays.asList(children);
+            files.sort(new FileComparator((o1, o2) -> new StringComparator().compare(o2.getName(), o1.getName())));
+            listView.getItems().addAll(files);
         } catch (IOException e) {
             e.printStackTrace();
         }
