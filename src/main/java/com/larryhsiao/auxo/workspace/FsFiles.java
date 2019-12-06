@@ -1,14 +1,12 @@
 package com.larryhsiao.auxo.workspace;
 
+import com.larryhsiao.auxo.utils.FileComparator;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.utility.comparator.StringComparator;
 
 import java.io.File;
 import java.nio.file.FileSystems;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Return all files in workspace.
@@ -34,9 +32,9 @@ public class FsFiles implements Source<Map<String, File>> {
         if (files != null) {
             List<File> fileList = Arrays.asList(files);
             final StringComparator comparator = new StringComparator();
-            fileList.sort((o1, o2) -> comparator.compare(o2.getName(), o1.getName()));
+            fileList.sort(new FileComparator((o1, o2) -> comparator.compare(o2.getName(), o1.getName())));
             for (File file : fileList) {
-                if (".auxo.db".equals(file.getName())){
+                if (".auxo.db".equals(file.getName())) {
                     continue;
                 }
                 result.put(file.getName(), file);
