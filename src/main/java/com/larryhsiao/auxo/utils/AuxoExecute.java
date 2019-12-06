@@ -17,12 +17,12 @@ import java.util.ResourceBundle;
 /**
  * Open given file.
  */
-public class FileOpening implements Action {
+public class AuxoExecute implements Action {
     private final Stage currentStage;
     private final File file;
     private final ResourceBundle res;
 
-    public FileOpening(Stage currentStage, File file, ResourceBundle res) {
+    public AuxoExecute(Stage currentStage, File file, ResourceBundle res) {
         this.currentStage = currentStage;
         this.file = file;
         this.res = res;
@@ -38,7 +38,7 @@ public class FileOpening implements Action {
         } else {
             new Thread(() -> {
                 try {
-                    new Execute(file).fire();
+                    new PlatformExecute(file).fire();
                 } catch (Exception e) {
                     Platform.runLater(() -> new ExceptionAlert(e, res).fire());
                 }

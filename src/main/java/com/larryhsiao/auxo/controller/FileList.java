@@ -1,39 +1,25 @@
 package com.larryhsiao.auxo.controller;
 
-import com.larryhsiao.auxo.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.tagging.*;
-import com.larryhsiao.auxo.utils.Execute;
-import com.larryhsiao.auxo.utils.FileOpening;
+import com.larryhsiao.auxo.utils.AuxoExecute;
 import com.larryhsiao.auxo.views.FileListCell;
 import com.larryhsiao.auxo.workspace.FsFiles;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.SingleConn;
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.sql.Connection;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -83,7 +69,7 @@ public class FileList implements Initializable {
         });
         fileList.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
-                new FileOpening(
+                new AuxoExecute(
                     ((Stage) fileList.getScene().getWindow()),
                     fileList.getSelectionModel().getSelectedItem(),
                     resources
@@ -92,7 +78,7 @@ public class FileList implements Initializable {
         });
         fileList.setOnKeyPressed(event -> {
             if (event.getCode() == ENTER) {
-                new FileOpening(
+                new AuxoExecute(
                     ((Stage) fileList.getScene().getWindow()),
                     fileList.getSelectionModel().getSelectedItem(),
                     resources

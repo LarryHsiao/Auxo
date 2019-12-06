@@ -1,7 +1,7 @@
 package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.tagging.*;
-import com.larryhsiao.auxo.utils.FileOpening;
+import com.larryhsiao.auxo.utils.AuxoExecute;
 import com.larryhsiao.auxo.views.FileListCell;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.SingleConn;
@@ -47,7 +47,7 @@ public class TagFiles implements Initializable {
 
         fileList.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
-                new FileOpening(
+                new AuxoExecute(
                     ((Stage) fileList.getScene().getWindow()),
                     fileList.getSelectionModel().getSelectedItem(),
                     resources
@@ -56,7 +56,7 @@ public class TagFiles implements Initializable {
         });
         fileList.setOnKeyPressed(event -> {
             if (event.getCode() == ENTER) {
-                new FileOpening(
+                new AuxoExecute(
                     ((Stage) fileList.getScene().getWindow()),
                     fileList.getSelectionModel().getSelectedItem(),
                     resources

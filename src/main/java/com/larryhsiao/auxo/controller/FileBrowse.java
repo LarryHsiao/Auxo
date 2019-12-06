@@ -1,25 +1,17 @@
 package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
-import com.larryhsiao.auxo.utils.Execute;
+import com.larryhsiao.auxo.utils.PlatformExecute;
 import com.larryhsiao.auxo.views.FileListCell;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.util.Callback;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import static javafx.scene.input.MouseButton.PRIMARY;
@@ -59,7 +51,7 @@ public class FileBrowse implements Initializable {
         } else {
             new Thread(() -> {
                 try {
-                    new Execute(selected).fire();
+                    new PlatformExecute(selected).fire();
                 } catch (Exception e) {
                     Platform.runLater(() -> new ExceptionAlert(e, res).fire());
                 }

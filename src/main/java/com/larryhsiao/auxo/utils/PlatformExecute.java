@@ -9,10 +9,10 @@ import java.io.IOException;
 /**
  * Action to launch file by default application.
  */
-public class Execute implements Action {
+public class PlatformExecute implements Action {
     private final File file;
 
-    public Execute(File file) {
+    public PlatformExecute(File file) {
         this.file = file;
     }
 
