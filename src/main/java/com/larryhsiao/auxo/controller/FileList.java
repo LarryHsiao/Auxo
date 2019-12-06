@@ -19,6 +19,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -32,6 +34,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import static javafx.scene.input.KeyCode.ENTER;
 import static javafx.scene.input.MouseButton.PRIMARY;
 
 /**
@@ -105,24 +108,33 @@ public class FileList implements Initializable {
             }
         });
         fileList.setOnMouseClicked(event -> {
-            final File selectedFile = fileList.getSelectionModel().getSelectedItem();
-            if (selectedFile == null) {
-                return;
-            }
             if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
-                if (selectedFile.isDirectory()) {
-                    fileBrowse(selectedFile, resources);
-                } else {
-                    new Thread(() -> {
-                        try {
-                            new Execute(selectedFile).fire();
-                        } catch (Exception e) {
-                            Platform.runLater(() -> new ExceptionAlert(e, resources).fire());
-                        }
-                    }).start();
-                }
+                openSelectedFile(resources);
             }
         });
+        fileList.setOnKeyPressed(event -> {
+            if (event.getCode() == ENTER) {
+                openSelectedFile(resources);
+            }
+        });
+    }
+
+    private void openSelectedFile(ResourceBundle res) {
+        final File selectedFile = fileList.getSelectionModel().getSelectedItem();
+        if (selectedFile == null) {
+            return;
+        }
+        if (selectedFile.isDirectory()) {
+            fileBrowse(selectedFile, res);
+        } else {
+            new Thread(() -> {
+                try {
+                    new Execute(selectedFile).fire();
+                } catch (Exception e) {
+                    Platform.runLater(() -> new ExceptionAlert(e, res).fire());
+                }
+            }).start();
+        }
     }
 
     private void fileBrowse(File selected, ResourceBundle res) {
