@@ -7,7 +7,6 @@ import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.SingleConn;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,14 +15,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.TextFields;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.FileSystems;
 import java.sql.Connection;
 import java.util.ResourceBundle;
 
@@ -36,9 +36,10 @@ public class FileInfo implements Initializable {
     private final long fileId;
     private final ObservableList<Tag> tags = FXCollections.observableArrayList();
     private final Source<Connection> db = new SingleConn(new TagDbConn());
-    @FXML private Label fileName;
+    @FXML private TextField fileName;
     @FXML private ListView<Tag> tagList;
     @FXML private TextField newTagInput;
+    @FXML private AnchorPane contents;
 
     public FileInfo(long fileId) {
         this.fileId = fileId;
@@ -72,16 +73,13 @@ public class FileInfo implements Initializable {
                 new FileById(db, fileId)
             ).value().name()
         );
-        tagList.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
-                    final Tag selected = tagList.getSelectionModel().getSelectedItem();
-                    try {
-                        openTagFileDialog(selected);
-                    }catch (IOException e){
-                        new ExceptionAlert(e, resources).fire();
-                    }
+        tagList.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
+                final Tag selected = tagList.getSelectionModel().getSelectedItem();
+                try {
+                    openTagFileDialog(selected, resources);
+                } catch (IOException e) {
+                    new ExceptionAlert(e, resources).fire();
                 }
             }
         });
@@ -100,11 +98,32 @@ public class FileInfo implements Initializable {
                 return new TagByName(db, string).value();
             }
         });
+
+        final File fsFile = new File(
+            FileSystems.getDefault().getPath(".").toFile(),
+            new QueriedAFile(new FileById(db, fileId)).value().name()
+        );
+        if (fsFile.isDirectory()) {
+            loadContent(fsFile, resources);
+        }
     }
 
-    private void openTagFileDialog(Tag selected) throws IOException {
+    private void loadContent(File fsFile, ResourceBundle resources) {
+        try {
+            final FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/com/larryhsiao/auxo/file_browse.fxml")
+            );
+            loader.setController(new FileBrowse(fsFile));
+            contents.getChildren().clear();
+            contents.getChildren().add(loader.load());
+        } catch (IOException e) {
+            new ExceptionAlert(e, resources).fire();
+        }
+    }
+
+    private void openTagFileDialog(Tag selected, ResourceBundle res) throws IOException {
         final Stage currentStage = ((Stage) tagList.getScene().getWindow());
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/tag_files.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/tag_files.fxml"), res);
         loader.setController(new TagFiles(
             selected.id())
         );

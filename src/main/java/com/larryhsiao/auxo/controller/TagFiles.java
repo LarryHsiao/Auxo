@@ -5,9 +5,13 @@ import com.larryhsiao.auxo.utils.AuxoExecute;
 import com.larryhsiao.auxo.views.FileListCell;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.SingleConn;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -63,5 +67,25 @@ public class TagFiles implements Initializable {
                 ).fire();
             }
         });
+        fileList.setContextMenu(contextMenu(resources));
+    }
+
+    private ContextMenu contextMenu(ResourceBundle res) {
+        final ContextMenu menu = new ContextMenu();
+        final MenuItem remove = new MenuItem(res.getString("delete"));
+        remove.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                final File selected = fileList.getSelectionModel().getSelectedItem();
+                new DetachAction(
+                    db,
+                    new FileByName(db, selected.getName()).value().id(),
+                    tagId
+                ).fire();
+                fileList.getItems().remove(selected);
+            }
+        });
+        menu.getItems().add(remove);
+        return menu;
     }
 }

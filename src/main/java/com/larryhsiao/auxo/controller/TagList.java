@@ -57,7 +57,7 @@ public class TagList implements Initializable {
 
     private void loadTagFiles(Tag tag, ResourceBundle resources) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/tag_files.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/tag_files.fxml"), resources);
             loader.setController(new TagFiles(tag.id()));
             files.getChildren().clear();
             files.getChildren().add(loader.load());

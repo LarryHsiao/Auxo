@@ -9,7 +9,8 @@
     AnchorPane.leftAnchor="0.0"
     AnchorPane.rightAnchor="0.0"
     xmlns:fx="http://javafx.com/fxml">
-    <Label fx:id="fileName"   wrapText="true" />
+    <TextField fx:id="fileName"  editable="false" />
+    <AnchorPane fx:id="contents"/>
     <TextField fx:id="newTagInput"/>
     <ListView fx:id="tagList" VBox.vgrow="ALWAYS" />
 </VBox>
