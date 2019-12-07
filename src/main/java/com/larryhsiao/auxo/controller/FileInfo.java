@@ -3,6 +3,7 @@ package com.larryhsiao.auxo.controller;
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.tagging.*;
 import com.larryhsiao.auxo.views.TagListCell;
+import com.larryhsiao.auxo.views.TagStringConverter;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.SingleConn;
 import javafx.collections.FXCollections;
@@ -27,7 +28,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.FileSystems;
 import java.sql.Connection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static javafx.scene.input.MouseButton.PRIMARY;
 
@@ -37,6 +42,7 @@ import static javafx.scene.input.MouseButton.PRIMARY;
 public class FileInfo implements Initializable {
     private final long fileId;
     private final ObservableList<Tag> tags = FXCollections.observableArrayList();
+    private final Map<String, Tag> tagMap = new HashMap<>();
     private final Source<Connection> db = new SingleConn(new TagDbConn());
     @FXML private TextField fileName;
     @FXML private ListView<Tag> tagList;
@@ -60,13 +66,11 @@ public class FileInfo implements Initializable {
                 tag.id()
             ).fire();
             tags.add(tag);
+            tagMap.put(tag.name(), tag);
             newTagInput.setText("");
         });
-        tags.addAll(
-            new QueriedTags(
-                new TagsByFileId(db, fileId)
-            ).value().values()
-        );
+        tagMap.putAll(new QueriedTags(new TagsByFileId(db, fileId)).value());
+        tags.addAll(tagMap.values());
         tagList.setItems(tags);
         tagList.setCellFactory(param -> new TagListCell());
         tagList.setContextMenu(tagContextMenu(resources));
@@ -89,17 +93,7 @@ public class FileInfo implements Initializable {
             new TagsByKeyword(
                 db, param.getUserText()
             )
-        ).value().values(), new StringConverter<Tag>() {
-            @Override
-            public String toString(Tag object) {
-                return object.name();
-            }
-
-            @Override
-            public Tag fromString(String string) {
-                return new TagByName(db, string).value();
-            }
-        });
+        ).value().values().stream().filter(tag -> !tagMap.containsKey(tag.name())).collect(Collectors.toList()), new TagStringConverter(db));
 
         final File fsFile = new File(
             FileSystems.getDefault().getPath(".").toFile(),
@@ -108,7 +102,7 @@ public class FileInfo implements Initializable {
         if (fsFile.isDirectory()) {
             loadContent(fsFile, resources);
             VBox.setVgrow(contents, Priority.ALWAYS);
-        }else{
+        } else {
             VBox.setVgrow(tagList, Priority.ALWAYS);
         }
     }

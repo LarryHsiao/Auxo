@@ -40,19 +40,19 @@ public class FileListCell extends ListCell<File> {
                 imageUrl = getClass().getResource("/images/file.png").toString();
             }
             final StackPane container = new StackPane();
-            container.setPrefSize(100, 100);
+            container.setPrefSize(75, 75);
             final ImageView imageView = new ImageView(
                 new Image(
                     imageUrl,
-                    100,
-                    100,
+                    75,
+                    75,
                     true,
                     true,
                     true)
             );
             imageView.setPreserveRatio(true);
-            imageView.prefWidth(100);
-            imageView.prefHeight(100);
+            imageView.prefWidth(75);
+            imageView.prefHeight(75);
             container.getChildren().add(imageView);
             StackPane.setAlignment(imageView, Pos.CENTER);
             setGraphic(container);

@@ -129,23 +129,45 @@ public class FileList implements Initializable {
 
     private ContextMenu fileContextMenu(ResourceBundle res) {
         final ContextMenu menu = new ContextMenu();
+        final MenuItem rename = new MenuItem(res.getString("rename"));
+        menu.setOnAction(event -> {
+            final Stage current = ((Stage) fileList.getScene().getWindow());
+            final File selected = fileList.getSelectionModel().getSelectedItem();
+            final TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle(selected.getName());
+            dialog.setHeaderText(res.getString("rename"));
+            dialog.setContentText(res.getString("new_name"));
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(newName -> {
+                try {
+                    final File target = new File(selected.getParent(), newName);
+                    Files.move(selected.toPath(), target.toPath());
+                    new FileRenameAction(
+                        db,
+                        new FileByName(db, selected.getName()).value(),
+                        newName
+                    ).fire();
+                    loadInfo(target,res);
+                } catch (IOException e) {
+                    new ExceptionAlert(e, res).fire();
+                }
+            });
+        });
+        menu.getItems().add(rename);
         final MenuItem delete = new MenuItem(res.getString("delete"));
-        delete.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                final Stage current = ((Stage) fileList.getScene().getWindow());
-                final File selected = fileList.getSelectionModel().getSelectedItem();
-                final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle(selected.getName());
-                alert.setContentText(MessageFormat.format(res.getString("delete_obj"), selected.getName()));
-                alert.setHeaderText(res.getString("are_you_sure"));
-                alert.setX(current.getX() + 150);
-                alert.setY(current.getY() + 150);
-                final Optional<ButtonType> result = alert.showAndWait();
-                if (result.isPresent() && result.get() == ButtonType.OK) {
-                    if (!selected.delete()) {
-                        new ExceptionAlert(new Exception("Failed to delete " + selected.getName()), res).fire();
-                    }
+        delete.setOnAction(event -> {
+            final Stage current = ((Stage) fileList.getScene().getWindow());
+            final File selected = fileList.getSelectionModel().getSelectedItem();
+            final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle(selected.getName());
+            alert.setContentText(MessageFormat.format(res.getString("delete_obj"), selected.getName()));
+            alert.setHeaderText(res.getString("are_you_sure"));
+            alert.setX(current.getX() + 150);
+            alert.setY(current.getY() + 150);
+            final Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                if (!selected.delete()) {
+                    new ExceptionAlert(new Exception("Failed to delete " + selected.getName()), res).fire();
                 }
             }
         });
