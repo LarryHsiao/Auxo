@@ -12,5 +12,5 @@
     <TextField fx:id="fileName"  editable="false" />
     <AnchorPane fx:id="contents"/>
     <TextField fx:id="newTagInput"/>
-    <ListView fx:id="tagList" VBox.vgrow="ALWAYS" />
+    <ListView fx:id="tagList" />
 </VBox>

@@ -16,6 +16,8 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.TextFields;
@@ -105,6 +107,9 @@ public class FileInfo implements Initializable {
         );
         if (fsFile.isDirectory()) {
             loadContent(fsFile, resources);
+            VBox.setVgrow(contents, Priority.ALWAYS);
+        }else{
+            VBox.setVgrow(tagList, Priority.ALWAYS);
         }
     }
 
