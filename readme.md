@@ -11,3 +11,13 @@ Another file tagging app written in javaFx.
 
 Auxo will track the current directory as worksapce the tag can be attach to the same layer of directory.
 
+Build
+---
+
+The project is only built with Java 11, older jdks are not tested.
+
+This project have apply plugins to find javafx, just make sure you have right jdk to build this project. And note that in default setup, the workspace is at the project root. If you need to change it, run it in other directory. 
+
+```shell script
+./gradlew run
+```
