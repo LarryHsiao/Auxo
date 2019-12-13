@@ -1,0 +1,153 @@
+package com.larryhsiao.auxo.controller;
+
+import com.larryhsiao.auxo.dialogs.ExceptionAlert;
+import com.silverhetch.clotho.log.BeautyLog;
+import com.silverhetch.clotho.log.Log;
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.util.Callback;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.net.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+/**
+ * Controller for device list.
+ */
+public class Devices implements Initializable, Closeable {
+    private static final int PORT = 24000;
+    private boolean running = true;
+    private DatagramSocket socket = null;
+    private Map<String, Target> targetData = new HashMap<>();
+    @FXML private ListView<Target> listView;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        try {
+            listView.setCellFactory(new Callback<>() {
+                @Override
+                public ListCell<Target> call(ListView<Target> param) {
+                    return new ListCell<>() {
+                        @Override
+                        protected void updateItem(Target item, boolean empty) {
+                            super.updateItem(item, empty);
+                            if (empty) {
+                                setText("");
+                            } else {
+                                setText(item.address().toString());
+                            }
+                        }
+                    };
+                }
+            });
+            socket = new DatagramSocket(PORT);
+            receivingPacket();
+            NetworkInterface.getNetworkInterfaces().asIterator().forEachRemaining(networkInterface -> {
+                try {
+                    if (networkInterface.isUp() &&
+                        !networkInterface.isLoopback()
+                    ) {
+                        System.out.println(networkInterface.toString());
+                        networkInterface.getInetAddresses().asIterator().forEachRemaining(inetAddress -> {
+                        });
+                        for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
+                            if (interfaceAddress.getBroadcast() != null) {
+                                String msg = "This is sample message";
+                                new BeautyLog().value().debug("send " + interfaceAddress.getBroadcast().toString());
+                                socket.send(new DatagramPacket(
+                                    msg.getBytes(),
+                                    0,
+                                    msg.length(),
+                                    interfaceAddress.getBroadcast(),
+                                    PORT
+                                ));
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    new ExceptionAlert(e, resources).fire();
+                }
+            });
+        } catch (IOException e) {
+            new ExceptionAlert(e, resources).fire();
+        }
+    }
+
+    private void receivingPacket() {
+        new Thread(() -> {
+            try {
+                while (running) {
+                    final byte[] buffer = new byte[1024];
+                    final DatagramPacket packet = new DatagramPacket(buffer, 1024);
+                    socket.receive(packet);
+                    targetData.put(
+                        packet.getAddress().toString(),
+                        new ConstTarget(
+                            packet.getAddress(),
+                            new String(buffer).trim()
+                        )
+                    );
+                    Platform.runLater(this::updateList);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private void updateList() {
+        listView.getItems().clear();
+        listView.getItems().addAll(targetData.values());
+    }
+
+    @Override
+    public void close() throws IOException {
+        running = false;
+        socket.close();
+    }
+
+    /**
+     * Constant implementation of {@link Target}
+     */
+    private static class ConstTarget implements Target {
+        private final InetAddress address;
+        private final String message;
+
+        private ConstTarget(InetAddress address, String message) {
+            this.address = address;
+            this.message = message;
+        }
+
+        @Override
+        public InetAddress address() {
+            return address;
+        }
+
+        @Override
+        public String title() {
+            return message;
+        }
+    }
+
+    /**
+     * The founded remote device
+     */
+    private interface Target {
+
+        /**
+         * @return The address that we received message from.
+         */
+        InetAddress address();
+
+        /**
+         * The title of this device target.
+         */
+        String title();
+    }
+}
