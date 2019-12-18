@@ -1,5 +1,7 @@
 package com.larryhsiao.auxo.controller;
 
+import com.larryhsiao.auxo.utils.ImageToFile;
+import javafx.embed.swing.SwingFXUtils;
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.tagging.*;
 import com.larryhsiao.auxo.utils.AuxoExecute;
@@ -18,12 +20,17 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.InputMethodEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.*;
 import java.sql.Connection;
@@ -31,6 +38,7 @@ import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
@@ -97,7 +105,8 @@ public class FileList implements Initializable {
             }
         });
         fileList.setOnDragOver(event -> {
-            if (event.getDragboard().hasFiles()) {
+            if (event.getDragboard().hasFiles() ||
+                event.getDragboard().hasImage()) {
                 event.acceptTransferModes(MOVE);
             }
             event.consume();
@@ -115,6 +124,23 @@ public class FileList implements Initializable {
                     }).start();
                 }
             }
+
+            if (board.hasImage()) {
+                TextInputDialog dialog = new TextInputDialog("");
+                dialog.setHeaderText(resources.getString("image_name"));
+                dialog.getEditor().textProperty().addListener((observableValue, s, t1) ->
+                    dialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().setValue(
+                        new File(t1 + ".png").exists()
+                    ));
+                dialog.getEditor().setText("image");
+                Optional<String> result = dialog.showAndWait();
+                result.ifPresent(s -> {
+                    new ImageToFile(
+                        new File(s + ".png"),
+                        board.getImage()
+                    ).fire();
+                });
+            }
         });
         fileList.setContextMenu(fileContextMenu(resources));
 
@@ -130,8 +156,7 @@ public class FileList implements Initializable {
     private ContextMenu fileContextMenu(ResourceBundle res) {
         final ContextMenu menu = new ContextMenu();
         final MenuItem rename = new MenuItem(res.getString("rename"));
-        menu.setOnAction(event -> {
-            final Stage current = ((Stage) fileList.getScene().getWindow());
+        rename.setOnAction(event -> {
             final File selected = fileList.getSelectionModel().getSelectedItem();
             final TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle(selected.getName());
@@ -147,7 +172,7 @@ public class FileList implements Initializable {
                         new FileByName(db, selected.getName()).value(),
                         newName
                     ).fire();
-                    loadInfo(target,res);
+                    loadInfo(target, res);
                 } catch (IOException e) {
                     new ExceptionAlert(e, res).fire();
                 }

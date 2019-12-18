@@ -6,6 +6,7 @@ module auxo {
     requires java.sql;
     requires java.desktop;
     requires org.controlsfx.controls;
+    requires javafx.swing;
 
     opens com.larryhsiao.auxo.controller to javafx.fxml;
     exports com.larryhsiao.auxo;
