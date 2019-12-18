@@ -217,13 +217,20 @@ public class FileList implements Initializable {
         try (final WatchService watchService = FileSystems.getDefault().newWatchService()) {
             final WatchKey watchKey = path.register(watchService, ENTRY_CREATE, ENTRY_DELETE);
             while (true) {
-                final WatchKey wk = watchService.take();
-                for (WatchEvent<?> event : wk.pollEvents()) {
+                for (WatchEvent<?> event : watchKey.pollEvents()) {
                     final java.nio.file.Path changed = (java.nio.file.Path) event.context();
-                    // TODO: insert/update by changed
-                    Platform.runLater(this::loadFiles);
+                    if (changed.toFile().getAbsolutePath().contains(".auxo.db")){
+                        continue;
+                    }
+                    Platform.runLater(() -> {
+                        if (changed.toFile().exists()) {
+                            data.add(changed.toFile());
+                        } else {
+                            data.remove(changed.toFile());
+                        }
+                    });
                 }
-                boolean valid = wk.reset();
+                boolean valid = watchKey.reset();
                 if (!valid) {
                     System.out.println("Key has been unregisterede");
                 }
