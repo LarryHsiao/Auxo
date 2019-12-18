@@ -35,6 +35,7 @@ import java.net.URL;
 import java.nio.file.*;
 import java.sql.Connection;
 import java.text.MessageFormat;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -61,13 +62,21 @@ public class FileList implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         searchInput.textProperty().addListener((observable, oldValue, newValue) -> {
             String keyword = searchInput.textProperty().getValue();
-            Map<String, AFile> dbSearchRes = new QueriedAFiles(new FilesByKeyword(db, keyword)).value();
             data.clear();
             data.addAll(
                 new FsFiles().value().entrySet().stream()
                     .filter(entry -> entry.getKey().contains(keyword) ||
-                        dbSearchRes.containsKey(entry.getKey()))
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)).values()
+                        new QueriedAFiles(
+                            new FilesByKeyword(db, keyword)
+                        ).value().containsKey(entry.getKey()))
+                    .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (u, v) -> {
+                            throw new IllegalStateException(String.format("Duplicate key %s", u));
+                        },
+                        LinkedHashMap::new)
+                    ).values()
             );
         });
         loadFiles();
@@ -219,7 +228,7 @@ public class FileList implements Initializable {
             while (true) {
                 for (WatchEvent<?> event : watchKey.pollEvents()) {
                     final java.nio.file.Path changed = (java.nio.file.Path) event.context();
-                    if (changed.toFile().getAbsolutePath().contains(".auxo.db")){
+                    if (changed.toFile().getAbsolutePath().contains(".auxo.db")) {
                         continue;
                     }
                     Platform.runLater(() -> {

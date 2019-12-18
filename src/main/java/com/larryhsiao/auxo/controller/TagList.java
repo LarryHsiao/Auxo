@@ -4,6 +4,7 @@ import com.larryhsiao.auxo.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.tagging.*;
 import com.larryhsiao.auxo.views.TagListCell;
 import com.silverhetch.clotho.Source;
+import com.silverhetch.clotho.utility.comparator.StringComparator;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
 import java.text.MessageFormat;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -44,6 +46,12 @@ public class TagList implements Initializable {
             newTagInput.setText("");
         });
         data.addAll(new QueriedTags(new AllTags(tag)).value().values());
+        data.sorted(new Comparator<Tag>() {
+            @Override
+            public int compare(Tag tag, Tag t1) {
+                return new StringComparator().compare(tag.name(), t1.name());
+            }
+        });
         tagList.setCellFactory(param -> new TagListCell());
         tagList.setItems(data);
         tagList.setContextMenu(contextMenu(resources));
