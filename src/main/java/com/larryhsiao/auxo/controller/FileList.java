@@ -13,6 +13,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -20,6 +21,8 @@ import javafx.scene.control.*;
 import javafx.scene.input.Dragboard;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
@@ -150,14 +154,16 @@ public class FileList implements Initializable {
         });
         fileList.setContextMenu(fileContextMenu(resources));
 
-        // TODO: Threading tear down.
-        new Thread(() -> {
-            try {
-                listenForFileChange();
-            } catch (IOException | InterruptedException e) {
-                Platform.runLater(() -> new ExceptionAlert(e, resources).fire());
-            }
-        }).start();
+        Platform.runLater(() -> {
+            final Window window = fileList.getScene().getWindow();
+            new Thread(() -> {
+                try {
+                    listenForFileChange(window);
+                } catch (IOException | InterruptedException e) {
+                    Platform.runLater(() -> new ExceptionAlert(e, resources).fire());
+                }
+            }).start();
+        });
     }
 
     private ContextMenu fileContextMenu(ResourceBundle res) {
@@ -219,10 +225,12 @@ public class FileList implements Initializable {
         data.addAll(new FsFiles(root).value().values());
     }
 
-    private void listenForFileChange() throws IOException, InterruptedException {
+    private void listenForFileChange(Window window) throws IOException, InterruptedException {
         try (final WatchService watchService = FileSystems.getDefault().newWatchService()) {
             final WatchKey watchKey = root.toPath().register(watchService, ENTRY_CREATE, ENTRY_DELETE);
-            while (Platform.isImplicitExit()) {
+            final AtomicBoolean running = new AtomicBoolean(true);
+            window.setOnHidden(event -> running.set(false));
+            while (running.get()) {
                 for (WatchEvent<?> event : watchKey.pollEvents()) {
                     final java.nio.file.Path changed = (java.nio.file.Path) event.context();
                     if (changed.toFile().getAbsolutePath().contains(".auxo.db")) {
