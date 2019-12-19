@@ -52,7 +52,7 @@ public class TagFiles implements Initializable {
                     root,
                     aFile.name()
                 ))
-                .sorted(new FileComparator((o1, o2)-> new StringComparator().compare(o2.getName(), o1.getName())))
+                .sorted(new FileComparator((o1, o2) -> new StringComparator().compare(o2.getName(), o1.getName())))
                 .collect(Collectors.toList())
         );
 
@@ -80,17 +80,14 @@ public class TagFiles implements Initializable {
     private ContextMenu contextMenu(ResourceBundle res) {
         final ContextMenu menu = new ContextMenu();
         final MenuItem remove = new MenuItem(res.getString("delete"));
-        remove.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                final File selected = fileList.getSelectionModel().getSelectedItem();
-                new DetachAction(
-                    db,
-                    new FileByName(db, selected.getName()).value().id(),
-                    tagId
-                ).fire();
-                fileList.getItems().remove(selected);
-            }
+        remove.setOnAction(event -> {
+            final File selected = fileList.getSelectionModel().getSelectedItem();
+            new DetachAction(
+                db,
+                new FileByName(db, selected.getName()).value().id(),
+                tagId
+            ).fire();
+            fileList.getItems().remove(selected);
         });
         menu.getItems().add(remove);
         return menu;

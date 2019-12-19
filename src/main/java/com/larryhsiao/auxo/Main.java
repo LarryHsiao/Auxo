@@ -29,6 +29,7 @@ public class Main extends Application {
         Scene scene = new Scene(loader.load());
         stage.setMinWidth(1280);
         stage.setMinHeight(720);
+        stage.setTitle(root.getAbsolutePath());
         stage.setScene(scene);
         stage.show();
     }
