@@ -2,9 +2,11 @@ package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.tagging.*;
 import com.larryhsiao.auxo.utils.AuxoExecute;
+import com.larryhsiao.auxo.utils.FileComparator;
 import com.larryhsiao.auxo.views.FileListCell;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.SingleConn;
+import com.silverhetch.clotho.utility.comparator.StringComparator;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -49,7 +51,9 @@ public class TagFiles implements Initializable {
                 .map(aFile -> new File(
                     root,
                     aFile.name()
-                )).collect(Collectors.toList())
+                ))
+                .sorted(new FileComparator((o1, o2)-> new StringComparator().compare(o2.getName(), o1.getName())))
+                .collect(Collectors.toList())
         );
 
         fileList.setOnMouseClicked(event -> {
