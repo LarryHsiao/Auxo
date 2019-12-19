@@ -7,8 +7,7 @@
     AnchorPane.topAnchor="0.0"
     AnchorPane.bottomAnchor="0.0"
     AnchorPane.leftAnchor="0.0"
-    AnchorPane.rightAnchor="0.0"
-    fx:controller="com.larryhsiao.auxo.controller.TagList">
+    AnchorPane.rightAnchor="0.0">
     <VBox>
         <TextField fx:id="newTagInput" />
         <ListView fx:id="tagList"

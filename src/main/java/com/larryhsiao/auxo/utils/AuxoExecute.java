@@ -18,11 +18,13 @@ import java.util.ResourceBundle;
  * Open given file.
  */
 public class AuxoExecute implements Action {
+    private final File root;
     private final Stage currentStage;
     private final File file;
     private final ResourceBundle res;
 
-    public AuxoExecute(Stage currentStage, File file, ResourceBundle res) {
+    public AuxoExecute(File root, Stage currentStage, File file, ResourceBundle res) {
+        this.root = root;
         this.currentStage = currentStage;
         this.file = file;
         this.res = res;
@@ -49,7 +51,7 @@ public class AuxoExecute implements Action {
     private void fileBrowse(File selected, ResourceBundle res) {
         try {
             final FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/file_browse.fxml"), res);
-            loader.setController(new FileBrowse(selected));
+            loader.setController(new FileBrowse(root, selected));
             final Stage newStage = new Stage();
             newStage.setTitle(selected.getName());
             newStage.setScene(new Scene(loader.load()));
