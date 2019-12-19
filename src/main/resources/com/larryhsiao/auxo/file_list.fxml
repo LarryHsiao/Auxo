@@ -3,7 +3,6 @@
 <?import java.lang.*?><?import java.util.*?><?import javafx.scene.*?><?import javafx.scene.control.*?><?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
-    fx:controller="com.larryhsiao.auxo.controller.FileList"
     AnchorPane.topAnchor="0.0"
     AnchorPane.bottomAnchor="0.0"
     AnchorPane.leftAnchor="0.0"

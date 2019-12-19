@@ -18,10 +18,6 @@ public class FsFiles implements Source<Map<String, File>> {
         this.workspace = workspace;
     }
 
-    public FsFiles() {
-        this.workspace = FileSystems.getDefault().getPath(".").toFile();
-    }
-
     @Override
     public Map<String, File> value() {
         if (!workspace.isDirectory()) {

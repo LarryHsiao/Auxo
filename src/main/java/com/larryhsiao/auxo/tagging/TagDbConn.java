@@ -4,6 +4,7 @@ import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.sqlite.SQLiteConn;
 import com.silverhetch.clotho.source.ConstSource;
 
+import java.io.File;
 import java.nio.file.FileSystems;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -19,9 +20,9 @@ public class TagDbConn implements Source<Connection> {
         this.connSource = connSource;
     }
 
-    public TagDbConn() {
+    public TagDbConn(File root) {
         this.connSource = new SQLiteConn(
-            FileSystems.getDefault().getPath(".auxo.db").toFile().getName()
+            new File(root, ".auxo.db").getAbsolutePath()
         );
     }
 

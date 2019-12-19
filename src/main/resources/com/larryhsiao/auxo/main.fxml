@@ -4,7 +4,6 @@
 
 <?import javafx.scene.layout.BorderPane?><?import javafx.scene.layout.VBox?><?import javafx.scene.control.Button?><?import javafx.scene.layout.AnchorPane?>
 <BorderPane maxHeight="-Infinity"
-    fx:controller="com.larryhsiao.auxo.controller.Main"
     maxWidth="-Infinity"
     minHeight="-Infinity"
     minWidth="-Infinity"

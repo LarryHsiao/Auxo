@@ -13,25 +13,25 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.TextFields;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.FileSystems;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static javafx.scene.input.MouseButton.PRIMARY;
@@ -40,17 +40,20 @@ import static javafx.scene.input.MouseButton.PRIMARY;
  * Controller to show File details.
  */
 public class FileInfo implements Initializable {
+    private final File root;
     private final long fileId;
     private final ObservableList<Tag> tags = FXCollections.observableArrayList();
     private final Map<String, Tag> tagMap = new HashMap<>();
-    private final Source<Connection> db = new SingleConn(new TagDbConn());
+    private final Source<Connection> db;
     @FXML private TextField fileName;
     @FXML private ListView<Tag> tagList;
     @FXML private TextField newTagInput;
     @FXML private AnchorPane contents;
 
-    public FileInfo(long fileId) {
+    public FileInfo(File root, long fileId) {
+        this.root = root;
         this.fileId = fileId;
+        this.db = new SingleConn(new TagDbConn(root));
     }
 
     @Override
@@ -96,7 +99,7 @@ public class FileInfo implements Initializable {
         ).value().values().stream().filter(tag -> !tagMap.containsKey(tag.name())).collect(Collectors.toList()), new TagStringConverter(db));
 
         final File fsFile = new File(
-            FileSystems.getDefault().getPath(".").toFile(),
+            root,
             new QueriedAFile(new FileById(db, fileId)).value().name()
         );
         if (fsFile.isDirectory()) {
@@ -110,9 +113,10 @@ public class FileInfo implements Initializable {
     private void loadContent(File fsFile, ResourceBundle resources) {
         try {
             final FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/com/larryhsiao/auxo/file_browse.fxml")
+                getClass().getResource("/com/larryhsiao/auxo/file_browse.fxml"),
+                resources
             );
-            loader.setController(new FileBrowse(fsFile));
+            loader.setController(new FileBrowse(root, fsFile));
             contents.getChildren().clear();
             contents.getChildren().add(loader.load());
         } catch (IOException e) {
@@ -124,7 +128,7 @@ public class FileInfo implements Initializable {
         final Stage currentStage = ((Stage) tagList.getScene().getWindow());
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/tag_files.fxml"), res);
         loader.setController(new TagFiles(
-            selected.id())
+            root, selected.id())
         );
         final Stage newStage = new Stage();
         newStage.setMinHeight(720);

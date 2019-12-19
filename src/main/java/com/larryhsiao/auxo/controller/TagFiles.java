@@ -28,12 +28,15 @@ import static javafx.scene.input.MouseButton.PRIMARY;
  * Controller for file list that have given tag attached.
  */
 public class TagFiles implements Initializable {
-    private final Source<Connection> db = new SingleConn(new TagDbConn());
+    private final File root;
+    private final Source<Connection> db;
     private final long tagId;
     @FXML private ListView<File> fileList;
 
-    public TagFiles(long tagId) {
+    public TagFiles(File root, long tagId) {
+        this.root = root;
         this.tagId = tagId;
+        this.db = new SingleConn(new TagDbConn(root));
     }
 
     @Override
@@ -44,7 +47,7 @@ public class TagFiles implements Initializable {
                 new FilesByTagId(db, tagId)
             ).value().values().stream()
                 .map(aFile -> new File(
-                    FileSystems.getDefault().getPath(".").toFile(),
+                    root,
                     aFile.name()
                 )).collect(Collectors.toList())
         );
@@ -52,7 +55,7 @@ public class TagFiles implements Initializable {
         fileList.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
                 new AuxoExecute(
-                    ((Stage) fileList.getScene().getWindow()),
+                    root, ((Stage) fileList.getScene().getWindow()),
                     fileList.getSelectionModel().getSelectedItem(),
                     resources
                 ).fire();
@@ -61,7 +64,7 @@ public class TagFiles implements Initializable {
         fileList.setOnKeyPressed(event -> {
             if (event.getCode() == ENTER) {
                 new AuxoExecute(
-                    ((Stage) fileList.getScene().getWindow()),
+                    root, ((Stage) fileList.getScene().getWindow()),
                     fileList.getSelectionModel().getSelectedItem(),
                     resources
                 ).fire();

@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -25,10 +24,12 @@ import static javafx.scene.input.MouseButton.PRIMARY;
  * Controller of file browsing.
  */
 public class FileBrowse implements Initializable {
+    private final File root;
     private final File target;
     @FXML private ListView<File> listView;
 
-    public FileBrowse(File target) {
+    public FileBrowse(File root, File target) {
+        this.root = root;
         this.target = target;
     }
 

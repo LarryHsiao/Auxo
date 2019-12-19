@@ -1,10 +1,9 @@
 package com.larryhsiao.auxo.controller;
 
-import com.larryhsiao.auxo.utils.ImageToFile;
-import javafx.embed.swing.SwingFXUtils;
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.tagging.*;
 import com.larryhsiao.auxo.utils.AuxoExecute;
+import com.larryhsiao.auxo.utils.ImageToFile;
 import com.larryhsiao.auxo.views.FileListCell;
 import com.larryhsiao.auxo.workspace.FsFiles;
 import com.silverhetch.clotho.Source;
@@ -14,23 +13,16 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.InputMethodEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.nio.file.*;
 import java.sql.Connection;
@@ -39,7 +31,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
@@ -52,11 +43,17 @@ import static javafx.scene.input.TransferMode.MOVE;
  * Controller of page that shows file list in Axuo.
  */
 public class FileList implements Initializable {
-    private final Source<Connection> db = new SingleConn(new TagDbConn());
+    private final File root;
+    private final Source<Connection> db;
     private final ObservableList<File> data = FXCollections.observableArrayList();
     @FXML private TextField searchInput;
     @FXML private ListView<File> fileList;
     @FXML private AnchorPane info;
+
+    public FileList(File root) {
+        this.root = root;
+        this.db = new SingleConn(new TagDbConn(root));
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -64,7 +61,7 @@ public class FileList implements Initializable {
             String keyword = searchInput.textProperty().getValue();
             data.clear();
             data.addAll(
-                new FsFiles().value().entrySet().stream()
+                new FsFiles(root).value().entrySet().stream()
                     .filter(entry -> entry.getKey().contains(keyword) ||
                         new QueriedAFiles(
                             new FilesByKeyword(db, keyword)
@@ -98,7 +95,7 @@ public class FileList implements Initializable {
         fileList.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
                 new AuxoExecute(
-                    ((Stage) fileList.getScene().getWindow()),
+                    root, ((Stage) fileList.getScene().getWindow()),
                     fileList.getSelectionModel().getSelectedItem(),
                     resources
                 ).fire();
@@ -107,7 +104,7 @@ public class FileList implements Initializable {
         fileList.setOnKeyPressed(event -> {
             if (event.getCode() == ENTER) {
                 new AuxoExecute(
-                    ((Stage) fileList.getScene().getWindow()),
+                    root, ((Stage) fileList.getScene().getWindow()),
                     fileList.getSelectionModel().getSelectedItem(),
                     resources
                 ).fire();
@@ -153,6 +150,7 @@ public class FileList implements Initializable {
         });
         fileList.setContextMenu(fileContextMenu(resources));
 
+        // TODO: Threading tear down.
         new Thread(() -> {
             try {
                 listenForFileChange();
@@ -211,21 +209,20 @@ public class FileList implements Initializable {
 
     private void moveFileIntoWorkspace(File file) throws IOException {
         Files.move(file.toPath(), new File(
-            FileSystems.getDefault().getPath(".").toFile(),
+            root,
             file.getName()
         ).toPath());
     }
 
     private void loadFiles() {
         data.clear();
-        data.addAll(new FsFiles().value().values());
+        data.addAll(new FsFiles(root).value().values());
     }
 
     private void listenForFileChange() throws IOException, InterruptedException {
-        final java.nio.file.Path path = FileSystems.getDefault().getPath(".");
         try (final WatchService watchService = FileSystems.getDefault().newWatchService()) {
-            final WatchKey watchKey = path.register(watchService, ENTRY_CREATE, ENTRY_DELETE);
-            while (true) {
+            final WatchKey watchKey = root.toPath().register(watchService, ENTRY_CREATE, ENTRY_DELETE);
+            while (Platform.isImplicitExit()) {
                 for (WatchEvent<?> event : watchKey.pollEvents()) {
                     final java.nio.file.Path changed = (java.nio.file.Path) event.context();
                     if (changed.toFile().getAbsolutePath().contains(".auxo.db")) {
@@ -239,10 +236,7 @@ public class FileList implements Initializable {
                         }
                     });
                 }
-                boolean valid = watchKey.reset();
-                if (!valid) {
-                    System.out.println("Key has been unregisterede");
-                }
+                watchKey.reset();
             }
         }
     }
@@ -251,10 +245,10 @@ public class FileList implements Initializable {
         try {
             final FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/file.fxml"), res);
             loader.setController(new FileInfo(
-                    new FileByName(
-                        db,
-                        selected.getName()
-                    ).value().id()
+                    root, new FileByName(
+                    db,
+                    selected.getName()
+                ).value().id()
                 )
             );
             info.getChildren().clear();
