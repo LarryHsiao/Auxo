@@ -20,7 +20,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         final File root = FileSystems.getDefault().getPath(".").toFile();
-        FXMLLoader loader = new FXMLLoader(
+        final FXMLLoader loader = new FXMLLoader(
             getClass().getResource("/com/larryhsiao/auxo/main.fxml"),
 //            getClass().getResource("/com/larryhsiao/auxo/tags.fxml"),
             ResourceBundle.getBundle("i18n/default")

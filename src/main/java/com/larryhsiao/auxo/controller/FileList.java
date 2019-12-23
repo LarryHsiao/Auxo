@@ -13,7 +13,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -22,7 +21,6 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import javafx.stage.WindowEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,7 +66,7 @@ public class FileList implements Initializable {
                 new FsFiles(root).value().entrySet().stream()
                     .filter(entry -> entry.getKey().contains(keyword) ||
                         new QueriedAFiles(
-                            new FilesByKeyword(db, keyword)
+                            new FilesByInput(db, keyword)
                         ).value().containsKey(entry.getKey()))
                     .collect(Collectors.toMap(
                         Map.Entry::getKey,
