@@ -7,7 +7,7 @@ module auxo {
     requires java.desktop;
     requires org.controlsfx.controls;
     requires javafx.swing;
-    requires Juno;
+    requires juno;
 
     opens com.larryhsiao.auxo.controller to javafx.fxml;
     exports com.larryhsiao.auxo;

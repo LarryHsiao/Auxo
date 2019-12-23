@@ -36,9 +36,8 @@ test {
 }
 
 dependencies {
-    // @todo #10 replace local jar with remote archive
-    implementation files("../Juno/build/libs/Juno-1.0.0.jar")
-    implementation 'com.silverhetch:clotho:1.14.0'
+    implementation 'com.larryhsiao:juno:1.0.0'
+    implementation 'com.silverhetch:clotho:1.15.0'
     implementation 'org.controlsfx:controlsfx:11.0.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
