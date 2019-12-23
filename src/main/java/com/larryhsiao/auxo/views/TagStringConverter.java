@@ -1,7 +1,7 @@
 package com.larryhsiao.auxo.views;
 
-import com.larryhsiao.auxo.tagging.Tag;
-import com.larryhsiao.auxo.tagging.TagByName;
+import com.larryhsiao.juno.Tag;
+import com.larryhsiao.juno.TagByName;
 import com.silverhetch.clotho.Source;
 import javafx.util.StringConverter;
 

@@ -1,11 +1,11 @@
 package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
-import com.larryhsiao.auxo.tagging.*;
 import com.larryhsiao.auxo.utils.AuxoExecute;
 import com.larryhsiao.auxo.utils.ImageToFile;
 import com.larryhsiao.auxo.views.FileListCell;
 import com.larryhsiao.auxo.workspace.FsFiles;
+import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.SingleConn;
 import javafx.application.Platform;
