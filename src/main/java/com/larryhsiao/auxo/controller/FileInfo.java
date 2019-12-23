@@ -1,7 +1,7 @@
 package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
-import com.larryhsiao.auxo.tagging.*;
+import com.larryhsiao.juno.*;
 import com.larryhsiao.auxo.views.TagListCell;
 import com.larryhsiao.auxo.views.TagStringConverter;
 import com.silverhetch.clotho.Source;

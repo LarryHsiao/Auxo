@@ -1,6 +1,6 @@
 package com.larryhsiao.auxo.views;
 
-import com.larryhsiao.auxo.tagging.Tag;
+import com.larryhsiao.juno.Tag;
 import javafx.scene.control.ListCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
