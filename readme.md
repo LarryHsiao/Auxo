@@ -21,3 +21,5 @@ This project have apply plugins to find javafx, just make sure you have right jd
 ```shell script
 ./gradlew run
 ```
+
+@todo #1 remove delete files in file tabel. 

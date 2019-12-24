@@ -34,9 +34,9 @@ public class FileListCell extends ListCell<File> {
                 imageUrl = item.toURI().toASCIIString();
             } else if ("..".equals(item.getName())) {
                 imageUrl = getClass().getResource("/images/back.png").toString();
-            }else if (item.isDirectory()) {
+            } else if (item.isDirectory()) {
                 imageUrl = getClass().getResource("/images/dir.png").toString();
-            }  else {
+            } else {
                 imageUrl = getClass().getResource("/images/file.png").toString();
             }
             final StackPane container = new StackPane();

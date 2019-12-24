@@ -5,8 +5,10 @@ import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.utility.comparator.StringComparator;
 
 import java.io.File;
-import java.nio.file.FileSystems;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Return all files in workspace.
@@ -30,7 +32,7 @@ public class FsFiles implements Source<Map<String, File>> {
             final StringComparator comparator = new StringComparator();
             fileList.sort(new FileComparator((o1, o2) -> comparator.compare(o2.getName(), o1.getName())));
             for (File file : fileList) {
-                if (".auxo.db".equals(file.getName())) {
+                if (file.getName().startsWith(".auxo.db")) {
                     continue;
                 }
                 result.put(file.getName(), file);
