@@ -5,9 +5,11 @@ import com.larryhsiao.auxo.utils.AuxoExecute;
 import com.larryhsiao.auxo.utils.ImageToFile;
 import com.larryhsiao.auxo.views.FileListCell;
 import com.larryhsiao.auxo.workspace.FsFiles;
-import com.larryhsiao.juno.*;
+import com.larryhsiao.juno.FileByName;
+import com.larryhsiao.juno.FileRenameAction;
+import com.larryhsiao.juno.FilesByInput;
+import com.larryhsiao.juno.QueriedAFiles;
 import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.database.SingleConn;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -52,9 +54,9 @@ public class FileList implements Initializable {
     @FXML private ListView<File> fileList;
     @FXML private AnchorPane info;
 
-    public FileList(File root) {
+    public FileList(File root, Source<Connection> db) {
         this.root = root;
-        this.db = new SingleConn(new TagDbConn(root));
+        this.db = db;
     }
 
     @Override
@@ -227,7 +229,6 @@ public class FileList implements Initializable {
         try (final WatchService watchService = FileSystems.getDefault().newWatchService()) {
             final WatchKey watchKey = root.toPath().register(watchService, ENTRY_CREATE, ENTRY_DELETE);
             final AtomicBoolean running = new AtomicBoolean(true);
-            window.setOnHidden(event -> running.set(false));
             while (running.get()) {
                 for (WatchEvent<?> event : watchKey.pollEvents()) {
                     final java.nio.file.Path changed = (java.nio.file.Path) event.context();
@@ -251,10 +252,11 @@ public class FileList implements Initializable {
         try {
             final FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/file.fxml"), res);
             loader.setController(new FileInfo(
-                    root, new FileByName(
-                    db,
-                    selected.getName()
-                ).value().id()
+                    root, db,
+                    new FileByName(
+                        db,
+                        selected.getName()
+                    ).value().id()
                 )
             );
             info.getChildren().clear();

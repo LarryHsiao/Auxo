@@ -1,14 +1,14 @@
 package com.larryhsiao.auxo.controller;
 
-import com.larryhsiao.juno.*;
 import com.larryhsiao.auxo.utils.AuxoExecute;
 import com.larryhsiao.auxo.utils.FileComparator;
 import com.larryhsiao.auxo.views.FileListCell;
+import com.larryhsiao.juno.DetachAction;
+import com.larryhsiao.juno.FileByName;
+import com.larryhsiao.juno.FilesByTagId;
+import com.larryhsiao.juno.QueriedAFiles;
 import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.database.SingleConn;
 import com.silverhetch.clotho.utility.comparator.StringComparator;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
@@ -18,7 +18,6 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.net.URL;
-import java.nio.file.FileSystems;
 import java.sql.Connection;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -35,10 +34,10 @@ public class TagFiles implements Initializable {
     private final long tagId;
     @FXML private ListView<File> fileList;
 
-    public TagFiles(File root, long tagId) {
+    public TagFiles(File root, Source<Connection> db, long tagId) {
         this.root = root;
+        this.db = db;
         this.tagId = tagId;
-        this.db = new SingleConn(new TagDbConn(root));
     }
 
     @Override

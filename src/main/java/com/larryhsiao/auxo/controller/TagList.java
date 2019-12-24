@@ -1,12 +1,10 @@
 package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
-import com.larryhsiao.juno.*;
 import com.larryhsiao.auxo.views.TagListCell;
+import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.utility.comparator.StringComparator;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -21,7 +19,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
 import java.text.MessageFormat;
-import java.util.Comparator;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -30,47 +27,40 @@ import java.util.ResourceBundle;
  */
 public class TagList implements Initializable {
     private final File root;
-    private final Source<Connection> tag;
+    private final Source<Connection> db;
     private final ObservableList<Tag> data = FXCollections.observableArrayList();
     @FXML private TextField newTagInput;
     @FXML private ListView<Tag> tagList;
     @FXML private AnchorPane files;
 
-    public TagList(File root) {
+    public TagList(File root, Source<Connection> db) {
         this.root = root;
-        this.tag = new TagDbConn(root);
+        this.db = db;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         newTagInput.setOnAction(event -> {
             tagList.getItems().add(
-                new CreatedTag(tag, newTagInput.getText()).value()
+                new CreatedTag(db, newTagInput.getText()).value()
             );
             newTagInput.setText("");
         });
-        data.addAll(new QueriedTags(new AllTags(tag)).value().values());
-        data.sorted(new Comparator<Tag>() {
-            @Override
-            public int compare(Tag tag, Tag t1) {
-                return new StringComparator().compare(tag.name(), t1.name());
-            }
-        });
+        data.addAll(new QueriedTags(new AllTags(db)).value().values());
+        final StringComparator comparator = new StringComparator();
+        data.sorted((tag, t1) -> comparator.compare(tag.name(), t1.name()));
         tagList.setCellFactory(param -> new TagListCell());
         tagList.setItems(data);
         tagList.setContextMenu(contextMenu(resources));
-        tagList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tag>() {
-            @Override
-            public void changed(ObservableValue<? extends Tag> observable, Tag oldValue, Tag newValue) {
-                loadTagFiles(newValue, resources);
-            }
-        });
+        tagList.getSelectionModel().selectedItemProperty()
+            .addListener((observable, oldValue, newValue) ->
+                loadTagFiles(newValue, resources));
     }
 
     private void loadTagFiles(Tag tag, ResourceBundle resources) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/tag_files.fxml"), resources);
-            loader.setController(new TagFiles(root, tag.id()));
+            loader.setController(new TagFiles(root, db, tag.id()));
             files.getChildren().clear();
             files.getChildren().add(loader.load());
         } catch (IOException e) {
@@ -93,7 +83,7 @@ public class TagList implements Initializable {
             alert.setY(current.getY() + 150);
             final Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                new TagDeletionById(tag, selected.id()).fire();
+                new TagDeletionById(db, selected.id()).fire();
                 tagList.getItems().remove(selected);
             }
         });

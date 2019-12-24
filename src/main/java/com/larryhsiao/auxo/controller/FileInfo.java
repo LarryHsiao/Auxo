@@ -1,11 +1,10 @@
 package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
-import com.larryhsiao.juno.*;
 import com.larryhsiao.auxo.views.TagListCell;
 import com.larryhsiao.auxo.views.TagStringConverter;
+import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.database.SingleConn;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -50,10 +49,10 @@ public class FileInfo implements Initializable {
     @FXML private TextField newTagInput;
     @FXML private AnchorPane contents;
 
-    public FileInfo(File root, long fileId) {
+    public FileInfo(File root, Source<Connection> db, long fileId) {
         this.root = root;
         this.fileId = fileId;
-        this.db = new SingleConn(new TagDbConn(root));
+        this.db = db;
     }
 
     @Override
@@ -128,7 +127,7 @@ public class FileInfo implements Initializable {
         final Stage currentStage = ((Stage) tagList.getScene().getWindow());
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/tag_files.fxml"), res);
         loader.setController(new TagFiles(
-            root, selected.id())
+            root, db, selected.id())
         );
         final Stage newStage = new Stage();
         newStage.setMinHeight(720);
