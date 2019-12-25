@@ -229,6 +229,7 @@ public class FileList implements Initializable {
         try (final WatchService watchService = FileSystems.getDefault().newWatchService()) {
             final WatchKey watchKey = root.toPath().register(watchService, ENTRY_CREATE, ENTRY_DELETE);
             final AtomicBoolean running = new AtomicBoolean(true);
+            window.setOnHidden(event -> running.set(false));
             while (running.get()) {
                 for (WatchEvent<?> event : watchKey.pollEvents()) {
                     final java.nio.file.Path changed = (java.nio.file.Path) event.context();
