@@ -6,8 +6,10 @@ import com.silverhetch.clotho.database.SingleConn;
 import com.silverhetch.clotho.database.sqlite.SQLiteConn;
 import com.silverhetch.clotho.source.ConstSource;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -39,6 +41,9 @@ public class Main extends Application {
         );
         loader.setController(new com.larryhsiao.auxo.controller.Main(root, db));
         Scene scene = new Scene(loader.load());
+        scene.getStylesheets().add(
+            getClass().getResource("/stylesheet/default.css").toExternalForm()
+        );
         stage.setMinWidth(1280);
         stage.setMinHeight(720);
         stage.setTitle(root.getAbsolutePath());
