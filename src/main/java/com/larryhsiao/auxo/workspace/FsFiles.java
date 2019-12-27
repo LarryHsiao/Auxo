@@ -32,7 +32,7 @@ public class FsFiles implements Source<Map<String, File>> {
             final StringComparator comparator = new StringComparator();
             fileList.sort(new FileComparator((o1, o2) -> comparator.compare(o2.getName(), o1.getName())));
             for (File file : fileList) {
-                if (file.getName().startsWith(".auxo.db")) {
+                if (file.getName().startsWith(".auxo.h2")) {
                     continue;
                 }
                 result.put(file.getName(), file);

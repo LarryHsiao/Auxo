@@ -54,7 +54,9 @@ public class AuxoExecute implements Action {
             loader.setController(new FileBrowse(root, selected));
             final Stage newStage = new Stage();
             newStage.setTitle(selected.getName());
-            newStage.setScene(new Scene(loader.load()));
+            final Scene scene = new Scene(loader.load());
+            scene.getStylesheets().addAll(currentStage.getScene().getStylesheets());
+            newStage.setScene(scene);
             newStage.setX(currentStage.getX() + 100);
             newStage.setY(currentStage.getY() + 100);
             newStage.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
