@@ -1,15 +1,14 @@
 package com.larryhsiao.auxo;
 
+import com.larryhsiao.auxo.workspace.FsFiles;
 import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.SingleConn;
 import com.silverhetch.clotho.database.sqlite.SQLiteConn;
 import com.silverhetch.clotho.source.ConstSource;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -17,6 +16,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 /**
@@ -31,9 +31,16 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        final File root = FileSystems.getDefault().getPath(".").toFile();
+//        final File root = FileSystems.getDefault().getPath(".").toFile();
+        final File root = new File("/home/larryhsiao/Dropbox/Elizabeth/MediaSamples/");
         db = new SingleConn(new TagDbConn(root));
         moveToH2();
+        new CleanUpFiles(
+            db,
+            new ConstSource<>(
+                new ArrayList(new FsFiles(root).value().keySet())
+            )
+        ).fire();
         final FXMLLoader loader = new FXMLLoader(
             getClass().getResource("/com/larryhsiao/auxo/main.fxml"),
 //            getClass().getResource("/com/larryhsiao/auxo/tags.fxml"),
@@ -61,13 +68,19 @@ public class Main extends Application {
         File previous = new File(".auxo.db");
         if (previous.exists()) {
             final Connection h2Conn = db.value();
-            final Connection sqliteConn = new SingleConn(new SQLiteConn(".auxo.db")).value();
-            new QueriedAFiles(new AllFiles(new ConstSource<>(sqliteConn))).value().forEach((s, aFile) -> {
-                AFile h2File = new FileByName(new ConstSource<>(h2Conn), aFile.name()).value();
+            final Connection sqliteConn =
+                new SingleConn(new SQLiteConn(".auxo.db")).value();
+            new QueriedAFiles(new AllFiles(new ConstSource<>(sqliteConn)))
+                .value().forEach((s, aFile) -> {
+                AFile h2File =
+                    new FileByName(new ConstSource<>(h2Conn), aFile.name())
+                        .value();
                 new QueriedTags(
                     new TagsByFileId(new ConstSource<>(sqliteConn), aFile.id())
                 ).value().forEach((s1, tag) -> {
-                    Tag h2Tag = new TagByName(new ConstSource<>(h2Conn), tag.name()).value();
+                    Tag h2Tag =
+                        new TagByName(new ConstSource<>(h2Conn), tag.name())
+                            .value();
                     new AttachAction(
                         new ConstSource<>(h2Conn),
                         h2File.id(),

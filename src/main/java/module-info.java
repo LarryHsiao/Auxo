@@ -2,6 +2,7 @@ module auxo {
     requires javafx.base;
     requires javafx.controls;
     requires javafx.fxml;
+    requires javafx.media;
     requires clotho;
     requires java.sql;
     requires java.desktop;
