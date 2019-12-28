@@ -177,13 +177,13 @@ public class FileInfo implements Initializable {
         final Stage currentStage = ((Stage) tagList.getScene().getWindow());
         FXMLLoader loader = new FXMLLoader(
             getClass().getResource("/com/larryhsiao/auxo/tag_files.fxml"), res);
-        loader.setController(new TagFiles(
-            root, db, selected.id())
-        );
+        loader.setController(new TagFiles(root, db, selected.id()));
         final Stage newStage = new Stage();
+        final Scene scene = new Scene(loader.load());
+        scene.getStylesheets().addAll(currentStage.getScene().getStylesheets());
         newStage.setMinHeight(720);
         newStage.setTitle(selected.name());
-        newStage.setScene(new Scene(loader.load()));
+        newStage.setScene(scene);
         newStage.setX(currentStage.getX() + 100);
         newStage.setY(currentStage.getY() + 100);
         newStage.addEventHandler(
