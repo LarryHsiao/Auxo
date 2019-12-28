@@ -22,7 +22,7 @@ public class FileMimeType implements Source<String> {
     public String value() {
         try {
             final String mimeType = Files.probeContentType(file.toPath());
-            if (mimeType.isEmpty()) {
+            if (mimeType == null || mimeType.isEmpty()) {
                 return "application/octet-stream";
             }
             return mimeType;

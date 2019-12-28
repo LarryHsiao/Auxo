@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.image.ImageView?><?import javafx.scene.layout.*?><?import javafx.scene.media.MediaView?>
+<?import javafx.scene.control.Slider?><?import javafx.scene.image.ImageView?><?import javafx.scene.layout.*?><?import javafx.scene.media.MediaView?>
 <StackPane fx:id="root"
     minHeight="300"
     minWidth="300"
@@ -13,8 +13,12 @@
 
     <MediaView fx:id="playerView" />
 
-    <ImageView fx:id="playback"
-        fitHeight="48.0"
-        fitWidth="48.0"
-        StackPane.alignment="BOTTOM_CENTER" />
+    <VBox alignment="BOTTOM_CENTER"
+        StackPane.alignment="BOTTOM_CENTER">
+        <ImageView fx:id="playback"
+            fitHeight="48.0"
+            fitWidth="48.0" />
+
+        <Slider fx:id="progress" />
+    </VBox>
 </StackPane>

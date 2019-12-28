@@ -2,6 +2,7 @@ package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.utils.FileMimeType;
+import com.larryhsiao.auxo.utils.SingleMediaPlayer;
 import com.larryhsiao.auxo.views.TagListCell;
 import com.larryhsiao.auxo.views.TagStringConverter;
 import com.larryhsiao.juno.*;
@@ -9,7 +10,6 @@ import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.file.IsImage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -21,12 +21,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import org.controlsfx.control.textfield.TextFields;
 
@@ -39,6 +35,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import static javafx.scene.input.KeyCode.ESCAPE;
+import static javafx.scene.input.KeyEvent.KEY_RELEASED;
 import static javafx.scene.input.MouseButton.PRIMARY;
 import static javafx.scene.layout.Priority.ALWAYS;
 
@@ -52,7 +50,6 @@ public class FileInfo implements Initializable {
         FXCollections.observableArrayList();
     private final Map<String, Tag> tagMap = new HashMap<>();
     private final Source<Connection> db;
-    private MediaPlayer player = null;
     @FXML private TextField fileName;
     @FXML private ListView<Tag> tagList;
     @FXML private TextField newTagInput;
@@ -118,6 +115,7 @@ public class FileInfo implements Initializable {
 
     private void loadContent(File fsFile, ResourceBundle resources) {
         try {
+            SingleMediaPlayer.release();
             final String mimeType = new FileMimeType(fsFile).value();
             if (fsFile.isDirectory()) {
                 loadDirectory(fsFile, resources);
@@ -136,15 +134,11 @@ public class FileInfo implements Initializable {
     }
 
     private void loadMedia(File fsFile, ResourceBundle res) throws IOException {
-        if (player != null) {
-            player.stop();
-        }
         final FXMLLoader loader = new FXMLLoader(
             getClass().getResource("/com/larryhsiao/auxo/video_player.fxml"),
             res
         );
-        player = new MediaPlayer(new Media(fsFile.toURI().toASCIIString()));
-        loader.setController(new Player(player));
+        loader.setController(new Player(fsFile.toURI().toASCIIString()));
         final Parent rootView = loader.load();
         contents.getChildren().clear();
         contents.getChildren().add(rootView);
@@ -192,13 +186,11 @@ public class FileInfo implements Initializable {
         newStage.setScene(new Scene(loader.load()));
         newStage.setX(currentStage.getX() + 100);
         newStage.setY(currentStage.getY() + 100);
-        newStage.addEventHandler(KeyEvent.KEY_RELEASED,
-            new EventHandler<KeyEvent>() {
-                @Override
-                public void handle(KeyEvent event) {
-                    if (event.getCode() == KeyCode.ESCAPE) {
-                        newStage.close();
-                    }
+        newStage.addEventHandler(
+            KEY_RELEASED,
+            event -> {
+                if (event.getCode() == ESCAPE) {
+                    newStage.close();
                 }
             });
         newStage.show();

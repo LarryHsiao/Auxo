@@ -49,7 +49,8 @@ import static javafx.scene.input.TransferMode.MOVE;
 public class FileList implements Initializable {
     private final File root;
     private final Source<Connection> db;
-    private final ObservableList<File> data = FXCollections.observableArrayList();
+    private final ObservableList<File> data =
+        FXCollections.observableArrayList();
     @FXML private TextField searchInput;
     @FXML private ListView<File> fileList;
     @FXML private AnchorPane info;
@@ -61,25 +62,33 @@ public class FileList implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        searchInput.textProperty().addListener((observable, oldValue, newValue) -> {
-            String keyword = searchInput.textProperty().getValue();
-            data.clear();
-            data.addAll(
-                new FsFiles(root).value().entrySet().stream()
-                    .filter(entry -> entry.getKey().contains(keyword) ||
-                        new QueriedAFiles(
-                            new FilesByInput(db, keyword)
-                        ).value().containsKey(entry.getKey()))
-                    .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (u, v) -> {
-                            throw new IllegalStateException(String.format("Duplicate key %s", u));
-                        },
-                        LinkedHashMap::new)
-                    ).values()
-            );
-        });
+        searchInput.textProperty()
+                   .addListener((observable, oldValue, newValue) -> {
+                       String keyword = searchInput.textProperty().getValue();
+                       data.clear();
+                       data.addAll(
+                           new FsFiles(root).value().entrySet().stream()
+                                            .filter(entry -> entry.getKey()
+                                                                  .contains(
+                                                                      keyword) ||
+                                                new QueriedAFiles(
+                                                    new FilesByInput(db,
+                                                        keyword)
+                                                ).value()
+                                                 .containsKey(entry.getKey()))
+                                            .collect(Collectors.toMap(
+                                                Map.Entry::getKey,
+                                                Map.Entry::getValue,
+                                                (u, v) -> {
+                                                    throw new IllegalStateException(
+                                                        String.format(
+                                                            "Duplicate key %s",
+                                                            u));
+                                                },
+                                                LinkedHashMap::new)
+                                            ).values()
+                       );
+                   });
         loadFiles();
         fileList.setCellFactory(param -> new FileListCell());
         fileList.setOnContextMenuRequested(event -> {
@@ -87,15 +96,18 @@ public class FileList implements Initializable {
             menu.show(fileList, event.getScreenX(), event.getScreenY());
         });
         fileList.setItems(data);
-        fileList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<File>() {
-            @Override
-            public void changed(ObservableValue<? extends File> observable, File oldValue, File newValue) {
-                if (newValue == null) {
-                    return;
-                }
-                loadInfo(newValue, resources);
-            }
-        });
+        fileList.getSelectionModel().selectedItemProperty()
+                .addListener(new ChangeListener<File>() {
+                    @Override
+                    public void changed(
+                        ObservableValue<? extends File> observable,
+                        File oldValue, File newValue) {
+                        if (newValue == null) {
+                            return;
+                        }
+                        loadInfo(newValue, resources);
+                    }
+                });
         fileList.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
                 new AuxoExecute(
@@ -138,10 +150,12 @@ public class FileList implements Initializable {
             if (board.hasImage()) {
                 TextInputDialog dialog = new TextInputDialog("");
                 dialog.setHeaderText(resources.getString("image_name"));
-                dialog.getEditor().textProperty().addListener((observableValue, s, t1) ->
-                    dialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().setValue(
-                        new File(t1 + ".png").exists()
-                    ));
+                dialog.getEditor().textProperty()
+                      .addListener((observableValue, s, t1) ->
+                          dialog.getDialogPane().lookupButton(ButtonType.OK)
+                                .disableProperty().setValue(
+                              new File(t1 + ".png").exists()
+                          ));
                 dialog.getEditor().setText("image");
                 Optional<String> result = dialog.showAndWait();
                 result.ifPresent(s -> {
@@ -160,7 +174,8 @@ public class FileList implements Initializable {
                 try {
                     listenForFileChange(window);
                 } catch (IOException | InterruptedException e) {
-                    Platform.runLater(() -> new ExceptionAlert(e, resources).fire());
+                    Platform.runLater(
+                        () -> new ExceptionAlert(e, resources).fire());
                 }
             }).start();
         });
@@ -170,7 +185,8 @@ public class FileList implements Initializable {
         final ContextMenu menu = new ContextMenu();
         final MenuItem rename = new MenuItem(res.getString("rename"));
         rename.setOnAction(event -> {
-            final File selected = fileList.getSelectionModel().getSelectedItem();
+            final File selected =
+                fileList.getSelectionModel().getSelectedItem();
             final TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle(selected.getName());
             dialog.setHeaderText(res.getString("rename"));
@@ -195,17 +211,21 @@ public class FileList implements Initializable {
         final MenuItem delete = new MenuItem(res.getString("delete"));
         delete.setOnAction(event -> {
             final Stage current = ((Stage) fileList.getScene().getWindow());
-            final File selected = fileList.getSelectionModel().getSelectedItem();
+            final File selected =
+                fileList.getSelectionModel().getSelectedItem();
             final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle(selected.getName());
-            alert.setContentText(MessageFormat.format(res.getString("delete_obj"), selected.getName()));
+            alert.setContentText(MessageFormat
+                .format(res.getString("delete_obj"), selected.getName()));
             alert.setHeaderText(res.getString("are_you_sure"));
             alert.setX(current.getX() + 150);
             alert.setY(current.getY() + 150);
             final Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 if (!selected.delete()) {
-                    new ExceptionAlert(new Exception("Failed to delete " + selected.getName()), res).fire();
+                    new ExceptionAlert(
+                        new Exception("Failed to delete " + selected.getName()),
+                        res).fire();
                 }
             }
         });
@@ -225,15 +245,21 @@ public class FileList implements Initializable {
         data.addAll(new FsFiles(root).value().values());
     }
 
-    private void listenForFileChange(Window window) throws IOException, InterruptedException {
-        try (final WatchService watchService = FileSystems.getDefault().newWatchService()) {
-            final WatchKey watchKey = root.toPath().register(watchService, ENTRY_CREATE, ENTRY_DELETE);
+    private void listenForFileChange(Window window)
+        throws IOException, InterruptedException {
+        try (final WatchService watchService = FileSystems.getDefault()
+                                                          .newWatchService()) {
+            final WatchKey watchKey = root.toPath()
+                                          .register(watchService, ENTRY_CREATE,
+                                              ENTRY_DELETE);
             final AtomicBoolean running = new AtomicBoolean(true);
             window.setOnHidden(event -> running.set(false));
             while (running.get()) {
                 for (WatchEvent<?> event : watchKey.pollEvents()) {
-                    final java.nio.file.Path changed = (java.nio.file.Path) event.context();
-                    if (changed.toFile().getAbsolutePath().contains(".auxo.db")) {
+                    final java.nio.file.Path changed =
+                        (java.nio.file.Path) event.context();
+                    if (changed.toFile().getAbsolutePath()
+                               .contains(".auxo.db")) {
                         continue;
                     }
                     Platform.runLater(() -> {
@@ -251,13 +277,13 @@ public class FileList implements Initializable {
 
     private void loadInfo(File selected, ResourceBundle res) {
         try {
-            final FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/file.fxml"), res);
+            final FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/com/larryhsiao/auxo/file.fxml"),
+                res
+            );
             loader.setController(new FileInfo(
                     root, db,
-                    new FileByName(
-                        db,
-                        selected.getName()
-                    ).value().id()
+                    new FileByName(db, selected.getName()).value().id()
                 )
             );
             info.getChildren().clear();
