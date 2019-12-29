@@ -109,7 +109,7 @@ public class FileBrowse implements Initializable {
         contents.getChildren().add(imageView);
         imageView.fitHeightProperty().bind(contents.heightProperty());
         imageView.fitWidthProperty().bind(contents.widthProperty());
-        VBox.setVgrow(contents, ALWAYS);
+        VBox.setVgrow(listView, ALWAYS);
     }
 
     private void loadDirectory(File dir) {

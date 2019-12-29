@@ -67,26 +67,24 @@ public class FileList implements Initializable {
                        String keyword = searchInput.textProperty().getValue();
                        data.clear();
                        data.addAll(
-                           new FsFiles(root).value().entrySet().stream()
-                                            .filter(entry -> entry.getKey()
-                                                                  .contains(
-                                                                      keyword) ||
-                                                new QueriedAFiles(
-                                                    new FilesByInput(db,
-                                                        keyword)
-                                                ).value()
-                                                 .containsKey(entry.getKey()))
-                                            .collect(Collectors.toMap(
-                                                Map.Entry::getKey,
-                                                Map.Entry::getValue,
-                                                (u, v) -> {
-                                                    throw new IllegalStateException(
-                                                        String.format(
-                                                            "Duplicate key %s",
-                                                            u));
-                                                },
-                                                LinkedHashMap::new)
-                                            ).values()
+                           new FsFiles(root)
+                               .value().entrySet().stream()
+                               .filter(
+                                   entry -> entry.getKey().contains(keyword) ||
+                                       new QueriedAFiles(
+                                           new FilesByInput(db, keyword))
+                                           .value()
+                                           .containsKey(entry.getKey()))
+                               .collect(Collectors.toMap(
+                                   Map.Entry::getKey,
+                                   Map.Entry::getValue,
+                                   (u, v) -> {
+                                       throw new IllegalStateException(
+                                           String
+                                               .format("Duplicate key %s", u));
+                                   },
+                                   LinkedHashMap::new)
+                               ).values()
                        );
                    });
         loadFiles();

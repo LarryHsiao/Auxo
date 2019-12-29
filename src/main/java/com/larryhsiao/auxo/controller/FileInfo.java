@@ -150,6 +150,7 @@ public class FileInfo implements Initializable {
             new Image(fsFile.toURI().toASCIIString(), true)
         );
         imageView.setPreserveRatio(true);
+        imageView.prefHeight(400);
         contents.getChildren().clear();
         contents.getChildren().add(imageView);
         imageView.fitHeightProperty().bind(contents.heightProperty());
