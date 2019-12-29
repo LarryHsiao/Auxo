@@ -31,10 +31,10 @@ import static javafx.scene.input.MouseButton.PRIMARY;
 public class TagFiles implements Initializable {
     private final File root;
     private final Source<Connection> db;
-    private final long tagId;
+    private final long[] tagId;
     @FXML private ListView<File> fileList;
 
-    public TagFiles(File root, Source<Connection> db, long tagId) {
+    public TagFiles(File root, Source<Connection> db, long... tagId) {
         this.root = root;
         this.db = db;
         this.tagId = tagId;
@@ -47,12 +47,13 @@ public class TagFiles implements Initializable {
             new QueriedAFiles(
                 new FilesByTagId(db, tagId)
             ).value().values().stream()
-                .map(aFile -> new File(
-                    root,
-                    aFile.name()
-                ))
-                .sorted(new FileComparator((o1, o2) -> new StringComparator().compare(o2.getName(), o1.getName())))
-                .collect(Collectors.toList())
+             .map(aFile -> new File(
+                 root,
+                 aFile.name()
+             ))
+             .sorted(new FileComparator((o1, o2) -> new StringComparator()
+                 .compare(o2.getName(), o1.getName())))
+             .collect(Collectors.toList())
         );
 
         fileList.setOnMouseClicked(event -> {
@@ -73,22 +74,30 @@ public class TagFiles implements Initializable {
                 ).fire();
             }
         });
-        fileList.setContextMenu(contextMenu(resources));
+        final var menu =new ContextMenu();
+        menu.getItems().add(removeContext(resources));
+        fileList.setContextMenu(menu);
+        fileList.setOnContextMenuRequested(event -> {
+            fileList.getContextMenu().getItems().clear();
+            if (tagId.length == 1) {
+                fileList.getContextMenu()
+                        .getItems().add(removeContext(resources));
+            }
+        });
     }
 
-    private ContextMenu contextMenu(ResourceBundle res) {
-        final ContextMenu menu = new ContextMenu();
+    private MenuItem removeContext(ResourceBundle res) {
         final MenuItem remove = new MenuItem(res.getString("delete"));
         remove.setOnAction(event -> {
-            final File selected = fileList.getSelectionModel().getSelectedItem();
+            final File selected =
+                fileList.getSelectionModel().getSelectedItem();
             new DetachAction(
                 db,
                 new FileByName(db, selected.getName()).value().id(),
-                tagId
+                tagId[0]
             ).fire();
             fileList.getItems().remove(selected);
         });
-        menu.getItems().add(remove);
-        return menu;
+        return remove;
     }
 }

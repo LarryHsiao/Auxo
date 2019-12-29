@@ -67,6 +67,7 @@ public class AuxoExecute implements Action {
                     }
                 }
             });
+            newStage.setOnHidden(event -> SingleMediaPlayer.release());
             newStage.show();
         } catch (Exception e) {
             new ExceptionAlert(e, res).fire();

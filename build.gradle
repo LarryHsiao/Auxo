@@ -36,7 +36,7 @@ test {
 }
 
 dependencies {
-    implementation 'com.larryhsiao:juno:1.0.3'
+    implementation 'com.larryhsiao:juno:1.0.9'
     implementation 'org.xerial:sqlite-jdbc:3.23.1'
     implementation 'com.silverhetch:clotho:1.15.0'
     implementation 'org.controlsfx:controlsfx:11.0.1'
