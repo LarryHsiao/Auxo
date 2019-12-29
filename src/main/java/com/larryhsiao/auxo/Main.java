@@ -31,8 +31,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-//        final File root = FileSystems.getDefault().getPath(".").toFile();
-        final File root = new File("/home/larryhsiao/Dropbox/Elizabeth/MediaSamples/");
+        final File root = FileSystems.getDefault().getPath(".").toFile();
         db = new SingleConn(new TagDbConn(root));
         moveToH2();
         new CleanUpFiles(
@@ -52,7 +51,7 @@ public class Main extends Application {
             getClass().getResource("/stylesheet/default.css").toExternalForm()
         );
         stage.setMinWidth(1280);
-        stage.setMinHeight(720);
+        stage.setMinHeight(900);
         stage.setTitle(root.getAbsolutePath());
         stage.setScene(scene);
         stage.show();

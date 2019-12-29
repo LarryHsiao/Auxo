@@ -2,8 +2,6 @@
 
 <?import javafx.scene.control.Slider?><?import javafx.scene.image.ImageView?><?import javafx.scene.layout.*?><?import javafx.scene.media.MediaView?>
 <StackPane fx:id="root"
-    minHeight="300"
-    minWidth="300"
     AnchorPane.bottomAnchor="0.0"
     AnchorPane.leftAnchor="0.0"
     AnchorPane.rightAnchor="0.0"
