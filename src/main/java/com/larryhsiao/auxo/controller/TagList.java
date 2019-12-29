@@ -5,6 +5,7 @@ import com.larryhsiao.auxo.views.TagListCell;
 import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.utility.comparator.StringComparator;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -28,7 +29,8 @@ import java.util.ResourceBundle;
 public class TagList implements Initializable {
     private final File root;
     private final Source<Connection> db;
-    private final ObservableList<Tag> data = FXCollections.observableArrayList();
+    private final ObservableList<Tag> data =
+        FXCollections.observableArrayList();
     @FXML private TextField newTagInput;
     @FXML private ListView<Tag> tagList;
     @FXML private AnchorPane files;
@@ -53,13 +55,15 @@ public class TagList implements Initializable {
         tagList.setItems(data);
         tagList.setContextMenu(contextMenu(resources));
         tagList.getSelectionModel().selectedItemProperty()
-            .addListener((observable, oldValue, newValue) ->
-                loadTagFiles(newValue, resources));
+               .addListener((observable, oldValue, newValue) ->
+                   loadTagFiles(newValue, resources));
     }
 
     private void loadTagFiles(Tag tag, ResourceBundle resources) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/tag_files.fxml"), resources);
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/com/larryhsiao/auxo/tag_files.fxml"),
+                resources);
             loader.setController(new TagFiles(root, db, tag.id()));
             files.getChildren().clear();
             files.getChildren().add(loader.load());
@@ -68,17 +72,46 @@ public class TagList implements Initializable {
         }
     }
 
-    private ContextMenu contextMenu(ResourceBundle resources) {
+    private ContextMenu contextMenu(ResourceBundle res) {
         ContextMenu menu = new ContextMenu();
+        MenuItem rename = new MenuItem();
+        rename.setText(res.getString("rename"));
+        rename.setOnAction(event -> {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+
+                    final Tag selected =
+                        tagList.getSelectionModel().getSelectedItem();
+                    final TextInputDialog dialog =
+                        new TextInputDialog(selected.name());
+                    dialog.setTitle(selected.name());
+                    dialog.setHeaderText(res.getString("rename"));
+                    dialog.setContentText(res.getString("new_name"));
+                    final Optional<String> result = dialog.showAndWait();
+                    result.ifPresent(newName -> {
+                        final int idx =
+                            tagList.getSelectionModel().getSelectedIndex();
+                        tagList.getItems().add(
+                            idx+1,
+                            new RenamedTag(db, selected, newName).value()
+                        );
+                        tagList.getItems().remove(idx);
+                    });
+                }
+            });
+        });
+        menu.getItems().add(rename);
         MenuItem delete = new MenuItem();
-        delete.setText(resources.getString("delete"));
+        delete.setText(res.getString("delete"));
         delete.setOnAction(event -> {
             final Stage current = ((Stage) tagList.getScene().getWindow());
             final Tag selected = tagList.getSelectionModel().getSelectedItem();
             final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle(selected.name());
-            alert.setContentText(MessageFormat.format(resources.getString("delete_obj"), selected.name()));
-            alert.setHeaderText(resources.getString("are_you_sure"));
+            alert.setContentText(MessageFormat
+                .format(res.getString("delete_obj"), selected.name()));
+            alert.setHeaderText(res.getString("are_you_sure"));
             alert.setX(current.getX() + 150);
             alert.setY(current.getY() + 150);
             final Optional<ButtonType> result = alert.showAndWait();
