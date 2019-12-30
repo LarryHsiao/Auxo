@@ -31,8 +31,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        final File root = FileSystems.getDefault().getPath(".").toFile();
-//        final File root = new File("/home/larryhsiao/Dropbox/Elizabeth/MediaSamples/");
+//        final File root = FileSystems.getDefault().getPath(".").toFile();
+        final File root = new File("/home/larryhsiao/Dropbox/Elizabeth/MediaSamples/");
         db = new SingleConn(new TagDbConn(root));
         moveToH2();
         new CleanUpFiles(
