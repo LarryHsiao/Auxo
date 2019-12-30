@@ -1,6 +1,7 @@
 package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
+import com.larryhsiao.auxo.utils.SingleMediaPlayer;
 import com.larryhsiao.auxo.views.TagListCell;
 import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
@@ -85,6 +86,7 @@ public class TagList implements Initializable {
 
     private void loadTagFiles(List<Tag> tag, ResourceBundle resources) {
         try {
+            SingleMediaPlayer.release();
             final FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/com/larryhsiao/auxo/tag_files.fxml"),
                 resources

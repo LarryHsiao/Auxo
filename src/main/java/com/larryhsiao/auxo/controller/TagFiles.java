@@ -2,6 +2,8 @@ package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.utils.AuxoExecute;
 import com.larryhsiao.auxo.utils.FileComparator;
+import com.larryhsiao.auxo.utils.FileMimeType;
+import com.larryhsiao.auxo.utils.SingleMediaPlayer;
 import com.larryhsiao.auxo.views.FileListCell;
 import com.larryhsiao.juno.DetachAction;
 import com.larryhsiao.juno.FileByName;
@@ -10,13 +12,19 @@ import com.larryhsiao.juno.QueriedAFiles;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.utility.comparator.StringComparator;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
 import java.util.ResourceBundle;
@@ -33,6 +41,7 @@ public class TagFiles implements Initializable {
     private final Source<Connection> db;
     private final long[] tagId;
     @FXML private ListView<File> fileList;
+    @FXML private AnchorPane contents;
 
     public TagFiles(File root, Source<Connection> db, long... tagId) {
         this.root = root;
@@ -74,7 +83,7 @@ public class TagFiles implements Initializable {
                 ).fire();
             }
         });
-        final var menu =new ContextMenu();
+        final var menu = new ContextMenu();
         menu.getItems().add(removeContext(resources));
         fileList.setContextMenu(menu);
         fileList.setOnContextMenuRequested(event -> {
@@ -84,6 +93,43 @@ public class TagFiles implements Initializable {
                         .getItems().add(removeContext(resources));
             }
         });
+
+        fileList.getSelectionModel().selectedItemProperty().addListener(
+            (observable, oldValue, newValue) -> {
+                try {
+                    SingleMediaPlayer.release();
+                    final var mimeType = new FileMimeType(newValue).value();
+                    if (mimeType.startsWith("image")) {
+                        loadImage(newValue, resources);
+                    } else if (mimeType.startsWith("video")) {
+                        loadMedia(newValue, resources);
+                    }
+                }catch (Exception e){
+                    throw new RuntimeException(e);
+                }
+            });
+    }
+
+    private void loadMedia(File fsFile, ResourceBundle res) throws IOException {
+        final FXMLLoader loader = new FXMLLoader(
+            getClass().getResource("/com/larryhsiao/auxo/video_player.fxml"),
+            res
+        );
+        loader.setController(new Player(fsFile.toURI().toASCIIString()));
+        final Parent rootView = loader.load();
+        contents.getChildren().clear();
+        contents.getChildren().add(rootView);
+    }
+
+    private void loadImage(File fsFile, ResourceBundle res) {
+        final ImageView imageView = new ImageView(
+            new Image(fsFile.toURI().toASCIIString(), true)
+        );
+        imageView.setPreserveRatio(true);
+        contents.getChildren().clear();
+        contents.getChildren().add(imageView);
+        imageView.fitHeightProperty().bind(contents.heightProperty());
+        imageView.fitWidthProperty().bind(contents.widthProperty());
     }
 
     private MenuItem removeContext(ResourceBundle res) {
