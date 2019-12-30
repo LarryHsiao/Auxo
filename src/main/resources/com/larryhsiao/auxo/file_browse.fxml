@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.ListView?><?import javafx.scene.layout.*?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.*?>
 <VBox xmlns="http://javafx.com/javafx"
-    AnchorPane.topAnchor="0.0"
-    AnchorPane.bottomAnchor="0.0"
-    AnchorPane.leftAnchor="0.0"
-    AnchorPane.rightAnchor="0.0"
-    xmlns:fx="http://javafx.com/fxml">
-    <AnchorPane fx:id="contents" prefWidth="300" prefHeight="600"/>
+      prefWidth="600"
+      AnchorPane.topAnchor="0.0"
+      AnchorPane.bottomAnchor="0.0"
+      AnchorPane.leftAnchor="0.0"
+      AnchorPane.rightAnchor="0.0"
+      xmlns:fx="http://javafx.com/fxml">
+    <AnchorPane fx:id="contents" prefWidth="300" prefHeight="300"/>
     <ListView fx:id="listView"
               prefHeight="400"
               VBox.vgrow="ALWAYS"/>
