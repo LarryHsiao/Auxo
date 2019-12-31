@@ -11,6 +11,8 @@ module auxo {
     requires kotlin.stdlib;
     requires javafx.swing;
     requires juno;
+    requires takes;
+    requires com.google.gson;
 
     opens com.larryhsiao.auxo.controller to javafx.fxml;
     exports com.larryhsiao.auxo;

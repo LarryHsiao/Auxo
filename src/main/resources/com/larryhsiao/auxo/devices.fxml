@@ -3,8 +3,7 @@
 <?import java.lang.*?><?import java.util.*?><?import javafx.scene.*?><?import javafx.scene.control.*?><?import javafx.scene.layout.*?>
 
 <AnchorPane xmlns="http://javafx.com/javafx"
-    xmlns:fx="http://javafx.com/fxml"
-    fx:controller="com.larryhsiao.auxo.controller.Devices">
+    xmlns:fx="http://javafx.com/fxml">
     <ListView fx:id="listView"
         AnchorPane.bottomAnchor="0.0"
         AnchorPane.leftAnchor="0.0"
