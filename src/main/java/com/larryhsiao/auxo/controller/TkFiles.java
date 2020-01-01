@@ -5,15 +5,14 @@ import org.takes.HttpException;
 import org.takes.Request;
 import org.takes.Response;
 import org.takes.Take;
+import org.takes.rq.RqHeaders;
 import org.takes.rq.RqHref;
-import org.takes.rs.RsText;
-import org.takes.rs.RsWithBody;
-import org.takes.rs.RsWithStatus;
-import org.takes.rs.RsWithType;
+import org.takes.rs.*;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 
 /**
@@ -47,8 +46,22 @@ public class TkFiles implements Take {
                 ), "application/json"
             );
         } else {
-            return new RsWithBody(new FileInputStream(file));
+            final InputStream is = new FileInputStream(file);
+            if (new RqHeaders.Smart(request).names().contains("range")) {
+                is.skip(startLocation(request));
+                return new RsWithStatus(new RsWithHeader(new RsWithBody(is),
+                    "range", startLocation(request)+"-"),206);
+            }
+            return new RsWithBody(is);
         }
+    }
+
+    private long startLocation(Request req) throws IOException {
+        return Long.parseLong(
+            new RqHeaders.Smart(req).single("Range")
+                .replace("bytes=", "")
+                .replace("-", "")
+        );
     }
 
     private String contentJson(File root) {
