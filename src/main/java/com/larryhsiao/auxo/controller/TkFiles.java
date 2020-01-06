@@ -1,6 +1,7 @@
 package com.larryhsiao.auxo.controller;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.takes.HttpException;
 import org.takes.Request;
 import org.takes.Response;
@@ -50,7 +51,7 @@ public class TkFiles implements Take {
             if (new RqHeaders.Smart(request).names().contains("range")) {
                 is.skip(startLocation(request));
                 return new RsWithStatus(new RsWithHeader(new RsWithBody(is),
-                    "range", startLocation(request)+"-"),206);
+                    "range", startLocation(request) + "-"), 206);
             }
             return new RsWithBody(is);
         }
@@ -65,11 +66,14 @@ public class TkFiles implements Take {
     }
 
     private String contentJson(File root) {
-        JsonArray json = new JsonArray();
-        File[] files = root.listFiles();
+        final JsonArray json = new JsonArray();
+        final File[] files = root.listFiles();
         if (files != null) {
             for (File file : files) {
-                json.add(file.getName());
+                final JsonObject obj = new JsonObject();
+                obj.addProperty("name", file.getName());
+                obj.addProperty("isDirectory", file.isDirectory());
+                json.add(obj);
             }
         }
         return json.toString();

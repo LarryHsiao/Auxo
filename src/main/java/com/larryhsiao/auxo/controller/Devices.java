@@ -63,7 +63,7 @@ public class Devices implements Initializable, Closeable {
                 try {
                     new FtBasic(
                         new TkFork(
-                            new FkRegex(".+", new TkFiles(root))
+                            new FkRegex(".*", new TkFiles(root))
                         ), PORT_API
                     ).start(() -> !running);
                 } catch (IOException e) {
