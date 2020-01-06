@@ -13,6 +13,7 @@
         <VBox>
             <Button fx:id="fileManagement" />
             <Button fx:id="tagManagement" />
+            <Button fx:id="devices"/>
         </VBox>
     </left>
     <center>

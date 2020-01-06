@@ -11,8 +11,6 @@ import com.larryhsiao.juno.FilesByInput;
 import com.larryhsiao.juno.QueriedAFiles;
 import com.silverhetch.clotho.Source;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -95,16 +93,11 @@ public class FileList implements Initializable {
         });
         fileList.setItems(data);
         fileList.getSelectionModel().selectedItemProperty()
-                .addListener(new ChangeListener<File>() {
-                    @Override
-                    public void changed(
-                        ObservableValue<? extends File> observable,
-                        File oldValue, File newValue) {
-                        if (newValue == null) {
-                            return;
-                        }
-                        loadInfo(newValue, resources);
+                .addListener((observable, oldValue, newValue) -> {
+                    if (newValue == null) {
+                        return;
                     }
+                    loadInfo(newValue, resources);
                 });
         fileList.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
@@ -254,14 +247,13 @@ public class FileList implements Initializable {
             window.setOnHidden(event -> running.set(false));
             while (running.get()) {
                 for (WatchEvent<?> event : watchKey.pollEvents()) {
-                    final java.nio.file.Path changed =
-                        (java.nio.file.Path) event.context();
+                    final Path changed = (Path) event.context();
                     if (changed.toFile().getAbsolutePath()
                                .contains(".auxo.db")) {
                         continue;
                     }
                     Platform.runLater(() -> {
-                        if (changed.toFile().exists()) {
+                        if (event.kind() == ENTRY_CREATE) {
                             data.add(changed.toFile());
                         } else {
                             data.remove(changed.toFile());

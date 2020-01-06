@@ -15,7 +15,7 @@ repositories {
 }
 mainClassName = "$moduleName/com.larryhsiao.auxo.Main"
 applicationDefaultJvmArgs = [
-        "--add-exports=javafx.base/com.sun.javafx.event=org.controlsfx.controls"
+        "--add-exports=javafx.base/com.sun.javafx.event=org.controlsfx.controls",
 ]
 
 javafx {
@@ -36,13 +36,15 @@ test {
 }
 
 dependencies {
-    implementation ('com.larryhsiao:juno:1.0.9'){
-        exclude group:'com.h2database'
+    implementation('com.larryhsiao:juno:1.0.9') {
+        exclude group: 'com.h2database'
     }
     implementation 'com.h2database:h2:1.4.199'
+    implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'org.xerial:sqlite-jdbc:3.23.1'
     implementation 'com.silverhetch:clotho:1.15.0'
     implementation 'org.controlsfx:controlsfx:11.0.1'
+    implementation group: 'org.takes', name: 'takes', version: '1.11.3'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
 }

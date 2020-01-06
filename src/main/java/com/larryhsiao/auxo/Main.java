@@ -11,7 +11,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.Closeable;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.sql.Connection;
@@ -32,7 +34,8 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 //        final File root = FileSystems.getDefault().getPath(".").toFile();
-        final File root = new File("/home/larryhsiao/Dropbox/Elizabeth/MediaSamples/");
+        final File root =
+            new File("/home/larryhsiao/Dropbox/Elizabeth/MediaSamples/");
         db = new SingleConn(new TagDbConn(root));
         moveToH2();
         new CleanUpFiles(
@@ -51,10 +54,22 @@ public class Main extends Application {
         scene.getStylesheets().add(
             getClass().getResource("/stylesheet/default.css").toExternalForm()
         );
+        stage.setOnHidden(event -> {
+            System.out.println("abc");
+        });
         stage.setMinWidth(1280);
         stage.setMinHeight(900);
         stage.setTitle(root.getAbsolutePath());
         stage.setScene(scene);
+        stage.setOnCloseRequest(event -> {
+            try {
+                if (loader.getController() instanceof Closeable) {
+                    ((Closeable) loader.getController()).close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
         stage.show();
     }
 
