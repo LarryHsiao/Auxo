@@ -1,3 +1,8 @@
 * {
     -fx-font-family: 'Noto Sans Mono CJK TC';
 }
+
+.title1 {
+    -fx-font-size: 50px;
+}
+
