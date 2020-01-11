@@ -20,14 +20,15 @@ public class FileIconUrl implements Source<String> {
         try {
             URL iconFileUrl = getClass()
                 .getResource("/images/file_type/" + extension.value() + ".png");
-            if (new File(iconFileUrl.toURI()).exists()) {
+            if (iconFileUrl != null) {
                 return iconFileUrl.toString();
             } else {
                 return getClass()
-                    .getResource("/images/file_type/046-file-45.png")
+                    .getResource("/images/file_type/file.png")
                     .toString();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return getClass()
                 .getResource("/images/file_type/file.png")
                 .toString();
