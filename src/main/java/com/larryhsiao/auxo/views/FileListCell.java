@@ -1,5 +1,6 @@
 package com.larryhsiao.auxo.views;
 
+import com.silverhetch.clotho.file.Extension;
 import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
 import javafx.scene.image.Image;
@@ -33,11 +34,12 @@ public class FileListCell extends ListCell<File> {
                 "image/jpeg".equals(Files.probeContentType(item.toPath()))) {
                 imageUrl = item.toURI().toASCIIString();
             } else if ("..".equals(item.getName())) {
-                imageUrl = getClass().getResource("/images/back.png").toString();
+                imageUrl =
+                    getClass().getResource("/images/back.png").toString();
             } else if (item.isDirectory()) {
                 imageUrl = getClass().getResource("/images/dir.png").toString();
             } else {
-                imageUrl = getClass().getResource("/images/file.png").toString();
+                imageUrl = new FileIconUrl(new Extension(item)).value();
             }
             final StackPane container = new StackPane();
             container.setPrefSize(75, 75);

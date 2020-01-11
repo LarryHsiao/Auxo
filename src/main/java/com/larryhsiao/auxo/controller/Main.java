@@ -6,8 +6,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
 import java.io.Closeable;
 import java.io.File;
@@ -15,6 +17,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
 import java.util.ResourceBundle;
+
+import static javafx.scene.input.MouseEvent.MOUSE_PRESSED;
+import static javafx.stage.StageStyle.UNDECORATED;
 
 /**
  * Controller for entry page of Auxo.
@@ -31,6 +36,7 @@ public class Main implements Initializable, Closeable {
     @FXML private Button tagManagement;
     @FXML private Button fileManagement;
     @FXML private Button devices;
+    @FXML private Button about;
     @FXML private AnchorPane content;
 
     public Main(File root, Source<Connection> db) {
@@ -48,7 +54,32 @@ public class Main implements Initializable, Closeable {
         fileManagement.setOnAction(event -> loadFileList(res));
         devices.setText(res.getString("devices"));
         devices.setOnAction(event -> loadDevices(res));
+        about.setOnAction(event -> loadAbout(res));
+        about.setText(res.getString("about"));
         loadFileList(res);
+    }
+
+    private void loadAbout(ResourceBundle res) {
+        try {
+            final Scene scene = new Scene(FXMLLoader.load(
+                getClass().getResource("/com/larryhsiao/auxo/about.fxml"),
+                res
+            ));
+            scene.getStylesheets().addAll(content.getScene().getStylesheets());
+            final Stage stage = new Stage();
+            stage.initStyle(UNDECORATED);
+            stage.setScene(scene);
+            stage.addEventHandler(MOUSE_PRESSED, event -> stage.close());
+            stage.focusedProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (!newValue) {
+                        stage.close();
+                    }
+                });
+            stage.showAndWait();
+        } catch (IOException e) {
+            new ExceptionAlert(e, res).fire();
+        }
     }
 
     private void loadDevices(ResourceBundle res) {
