@@ -5,21 +5,22 @@ import com.google.gson.JsonObject;
 import com.silverhetch.clotho.Source;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Json of given file.
  */
 public class DeviceJson implements Source<String> {
-    private final File root;
+    private final Source<List<File>> fileSource;
 
-    public DeviceJson(File root) {
-        this.root = root;
+    public DeviceJson(Source<List<File>> fileSource) {
+        this.fileSource = fileSource;
     }
 
     @Override
     public String value() {
         final JsonArray json = new JsonArray();
-        final File[] files = root.listFiles();
+        final var files = fileSource.value();
         if (files != null) {
             for (File file : files) {
                 final JsonObject obj = new JsonObject();
