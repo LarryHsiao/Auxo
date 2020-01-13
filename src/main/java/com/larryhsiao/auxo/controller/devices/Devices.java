@@ -8,6 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
+import org.takes.facets.fork.FkMethods;
 import org.takes.facets.fork.FkRegex;
 import org.takes.facets.fork.TkFork;
 import org.takes.http.FtBasic;
@@ -63,7 +64,10 @@ public class Devices implements Initializable, Closeable {
                 try {
                     new FtBasic(
                         new TkFork(
-                            new FkRegex(".*", new TkFiles(root))
+                            new FkRegex(".+", new TkFork(
+                                new FkMethods("GET", new TkFiles(root)),
+                                new FkMethods("HEAD", new TkFileHeads(root))
+                            ))
                         ), PORT_API
                     ).start(() -> !running);
                 } catch (IOException e) {
