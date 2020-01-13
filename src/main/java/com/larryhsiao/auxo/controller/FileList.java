@@ -39,7 +39,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 import static javafx.scene.input.KeyCode.ENTER;
 import static javafx.scene.input.MouseButton.PRIMARY;
-import static javafx.scene.input.TransferMode.MOVE;
+import static javafx.scene.input.TransferMode.COPY;
 
 /**
  * Controller of page that shows file list in Axuo.
@@ -61,30 +61,30 @@ public class FileList implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         searchInput.textProperty()
-                   .addListener((observable, oldValue, newValue) -> {
-                       String keyword = searchInput.textProperty().getValue();
-                       data.clear();
-                       data.addAll(
-                           new FsFiles(root)
-                               .value().entrySet().stream()
-                               .filter(
-                                   entry -> entry.getKey().contains(keyword) ||
-                                       new QueriedAFiles(
-                                           new FilesByInput(db, keyword))
-                                           .value()
-                                           .containsKey(entry.getKey()))
-                               .collect(Collectors.toMap(
-                                   Map.Entry::getKey,
-                                   Map.Entry::getValue,
-                                   (u, v) -> {
-                                       throw new IllegalStateException(
-                                           String
-                                               .format("Duplicate key %s", u));
-                                   },
-                                   LinkedHashMap::new)
-                               ).values()
-                       );
-                   });
+            .addListener((observable, oldValue, newValue) -> {
+                String keyword = searchInput.textProperty().getValue();
+                data.clear();
+                data.addAll(
+                    new FsFiles(root)
+                        .value().entrySet().stream()
+                        .filter(
+                            entry -> entry.getKey().contains(keyword) ||
+                                new QueriedAFiles(
+                                    new FilesByInput(db, keyword))
+                                    .value()
+                                    .containsKey(entry.getKey()))
+                        .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            Map.Entry::getValue,
+                            (u, v) -> {
+                                throw new IllegalStateException(
+                                    String
+                                        .format("Duplicate key %s", u));
+                            },
+                            LinkedHashMap::new)
+                        ).values()
+                );
+            });
         loadFiles();
         fileList.setCellFactory(param -> new FileListCell());
         fileList.setOnContextMenuRequested(event -> {
@@ -93,12 +93,12 @@ public class FileList implements Initializable {
         });
         fileList.setItems(data);
         fileList.getSelectionModel().selectedItemProperty()
-                .addListener((observable, oldValue, newValue) -> {
-                    if (newValue == null) {
-                        return;
-                    }
-                    loadInfo(newValue, resources);
-                });
+            .addListener((observable, oldValue, newValue) -> {
+                if (newValue == null) {
+                    return;
+                }
+                loadInfo(newValue, resources);
+            });
         fileList.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
                 new AuxoExecute(
@@ -120,7 +120,7 @@ public class FileList implements Initializable {
         fileList.setOnDragOver(event -> {
             if (event.getDragboard().hasFiles() ||
                 event.getDragboard().hasImage()) {
-                event.acceptTransferModes(MOVE);
+                event.acceptTransferModes(COPY);
             }
             event.consume();
         });
@@ -142,11 +142,11 @@ public class FileList implements Initializable {
                 TextInputDialog dialog = new TextInputDialog("");
                 dialog.setHeaderText(resources.getString("image_name"));
                 dialog.getEditor().textProperty()
-                      .addListener((observableValue, s, t1) ->
-                          dialog.getDialogPane().lookupButton(ButtonType.OK)
-                                .disableProperty().setValue(
-                              new File(t1 + ".png").exists()
-                          ));
+                    .addListener((observableValue, s, t1) ->
+                        dialog.getDialogPane().lookupButton(ButtonType.OK)
+                            .disableProperty().setValue(
+                            new File(t1 + ".png").exists()
+                        ));
                 dialog.getEditor().setText("image");
                 Optional<String> result = dialog.showAndWait();
                 result.ifPresent(s -> {
@@ -239,24 +239,33 @@ public class FileList implements Initializable {
     private void listenForFileChange(Window window)
         throws IOException, InterruptedException {
         try (final WatchService watchService = FileSystems.getDefault()
-                                                          .newWatchService()) {
+            .newWatchService()) {
             final WatchKey watchKey = root.toPath()
-                                          .register(watchService, ENTRY_CREATE,
-                                              ENTRY_DELETE);
+                .register(watchService, ENTRY_CREATE,
+                    ENTRY_DELETE);
             final AtomicBoolean running = new AtomicBoolean(true);
             window.setOnHidden(event -> running.set(false));
             while (running.get()) {
                 for (WatchEvent<?> event : watchKey.pollEvents()) {
                     final Path changed = (Path) event.context();
                     if (changed.toFile().getAbsolutePath()
-                               .contains(".auxo.db")) {
+                        .contains(".auxo.db")) {
                         continue;
                     }
                     Platform.runLater(() -> {
                         if (event.kind() == ENTRY_CREATE) {
-                            data.add(changed.toFile());
+                            data.add(
+                                new File(root, changed.toFile().getName()));
                         } else {
-                            data.remove(changed.toFile());
+                            var deleted =
+                                new File(root, changed.toFile().getName())
+                                    .getAbsolutePath();
+                            for (File file : data) {
+                                if (deleted.equals(file.getAbsolutePath())) {
+                                    data.remove(file);
+                                    break;
+                                }
+                            }
                         }
                     });
                 }

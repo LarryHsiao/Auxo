@@ -2,6 +2,7 @@ package com.larryhsiao.auxo.views;
 
 import com.silverhetch.clotho.file.Extension;
 import javafx.geometry.Pos;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.ListCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -11,8 +12,9 @@ import javafx.scene.layout.StackPane;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Collections;
 
-import static javafx.scene.input.TransferMode.COPY_OR_MOVE;
+import static javafx.scene.input.TransferMode.MOVE;
 
 /**
  * List cell that display a file.
@@ -24,8 +26,6 @@ public class FileListCell extends ListCell<File> {
         if (empty) {
             setText("");
             setGraphic(null);
-            setOnDragDetected(event -> {
-            });
         } else {
             setText(item.getName());
             var image = image(item);
@@ -37,13 +37,13 @@ public class FileListCell extends ListCell<File> {
             imageView.prefHeight(75);
             container.getChildren().add(imageView);
             StackPane.setAlignment(imageView, Pos.CENTER);
-            setGraphic(imageView);
+            setGraphic(container);
             setOnDragDetected(event -> {
-                var board = startDragAndDrop(COPY_OR_MOVE);
-                var content = new ClipboardContent();
-                content.getFiles().add(item);
-                board.setDragView(image);
+                final var board = startDragAndDrop(MOVE);
+                final var content = new ClipboardContent();
+                content.putFiles(Collections.singletonList(item));
                 board.setContent(content);
+                board.setDragView(imageView.getImage());
                 event.consume();
             });
         }
@@ -69,7 +69,7 @@ public class FileListCell extends ListCell<File> {
                 75,
                 true,
                 true,
-                false);
+                true);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
