@@ -8,13 +8,14 @@ import com.silverhetch.clotho.database.sqlite.SQLiteConn;
 import com.silverhetch.clotho.source.ConstSource;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -33,9 +34,9 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        final File root = FileSystems.getDefault().getPath(".").toFile();
-//        final File root =
-//            new File("/home/larryhsiao/Dropbox/Elizabeth/MediaSamples/");
+//        final File root = FileSystems.getDefault().getPath(".").toFile();
+        final File root =
+            new File("/home/larryhsiao/Dropbox/Elizabeth/MediaSamples/");
         db = new SingleConn(new TagDbConn(root));
         moveToH2();
         new CleanUpFiles(
@@ -67,6 +68,12 @@ public class Main extends Application {
                 e.printStackTrace();
             }
         });
+        var screens = Screen.getScreens();
+        if (screens.size() >= 2) {
+            final Rectangle2D bounds = screens.get(1).getVisualBounds();
+            stage.setX(bounds.getMinX() + 100);
+            stage.setY(bounds.getMinY() + 100);
+        }
         stage.show();
     }
 
