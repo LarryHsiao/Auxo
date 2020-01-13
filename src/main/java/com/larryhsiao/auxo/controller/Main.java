@@ -1,5 +1,6 @@
 package com.larryhsiao.auxo.controller;
 
+import com.larryhsiao.auxo.controller.devices.Devices;
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
 import com.silverhetch.clotho.Source;
 import javafx.fxml.FXML;
@@ -90,7 +91,8 @@ public class Main implements Initializable, Closeable {
             tearDownCurrentController(res);
             currentPage = PAGE_DEVICES;
             FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/com/larryhsiao/auxo/devices.fxml"),
+                getClass().getResource(
+                    "/com/larryhsiao/auxo/devices/devices.fxml"),
                 res
             );
             currentPageController = new Devices(root);

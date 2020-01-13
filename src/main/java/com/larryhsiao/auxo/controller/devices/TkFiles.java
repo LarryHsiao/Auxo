@@ -1,7 +1,5 @@
-package com.larryhsiao.auxo.controller;
+package com.larryhsiao.auxo.controller.devices;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import org.takes.HttpException;
 import org.takes.Request;
 import org.takes.Response;
@@ -42,7 +40,7 @@ public class TkFiles implements Take {
         if (file.isDirectory()) {
             return new RsWithType(
                 new RsWithStatus(
-                    new RsText(contentJson(file)),
+                    new RsText(new DeviceJson(file).value()),
                     HttpURLConnection.HTTP_OK
                 ), "application/json"
             );
@@ -65,17 +63,4 @@ public class TkFiles implements Take {
         );
     }
 
-    private String contentJson(File root) {
-        final JsonArray json = new JsonArray();
-        final File[] files = root.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                final JsonObject obj = new JsonObject();
-                obj.addProperty("name", file.getName());
-                obj.addProperty("isDirectory", file.isDirectory());
-                json.add(obj);
-            }
-        }
-        return json.toString();
-    }
 }

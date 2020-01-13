@@ -1,4 +1,4 @@
-package com.larryhsiao.auxo.controller;
+package com.larryhsiao.auxo.controller.devices;
 
 import com.google.gson.JsonObject;
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
