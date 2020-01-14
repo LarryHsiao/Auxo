@@ -6,7 +6,6 @@ import com.larryhsiao.auxo.views.TagListCell;
 import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.utility.comparator.StringComparator;
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -24,7 +23,9 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
+import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
 
 /**
@@ -34,8 +35,7 @@ public class TagList implements Initializable {
     private static final String MENU_ID_MERGE = "MENU_ID_MERGE";
     private final File root;
     private final Source<Connection> db;
-    private final ObservableList<Tag> data =
-        FXCollections.observableArrayList();
+    private final ObservableList<Tag> data = observableArrayList();
     @FXML private TextField newTagInput;
     @FXML private ListView<Tag> tagList;
     @FXML private AnchorPane files;
@@ -53,7 +53,10 @@ public class TagList implements Initializable {
             );
             newTagInput.setText("");
         });
-        data.addAll(new QueriedTags(new AllTags(db)).value().values());
+        data.addAll(new QueriedTags(new AllTags(db)).value().values()
+            .stream().sorted((o1, o2) -> new StringComparator()
+                .compare(o2.name(), o1.name()))
+            .collect(Collectors.toList()));
         final StringComparator comparator = new StringComparator();
         data.sorted((tag, t1) -> comparator.compare(tag.name(), t1.name()));
         tagList.setCellFactory(param -> new TagListCell());
@@ -143,7 +146,7 @@ public class TagList implements Initializable {
         delete.setText(res.getString("delete"));
         delete.setOnAction(event -> {
             final List<Tag> selected = tagList.getSelectionModel()
-                                              .getSelectedItems();
+                .getSelectedItems();
             if (selected.size() == 1) {
                 delete(selected.get(0), res);
             } else {
