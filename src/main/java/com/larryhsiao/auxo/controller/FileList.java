@@ -5,10 +5,7 @@ import com.larryhsiao.auxo.utils.AuxoExecute;
 import com.larryhsiao.auxo.utils.ImageToFile;
 import com.larryhsiao.auxo.views.FileListCell;
 import com.larryhsiao.auxo.workspace.FsFiles;
-import com.larryhsiao.juno.FileByName;
-import com.larryhsiao.juno.FileRenameAction;
-import com.larryhsiao.juno.FilesByInput;
-import com.larryhsiao.juno.QueriedAFiles;
+import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -21,6 +18,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import org.controlsfx.control.textfield.TextFields;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,35 +59,19 @@ public class FileList implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         searchInput.textProperty()
-            .addListener((observable, oldValue, newValue) -> {
-                String keyword = searchInput.textProperty().getValue();
-                data.clear();
-                data.addAll(
-                    new FsFiles(root)
-                        .value().entrySet().stream()
-                        .filter(
-                            entry -> entry.getKey().contains(keyword) ||
-                                new QueriedAFiles(
-                                    new FilesByInput(db, keyword))
-                                    .value()
-                                    .containsKey(entry.getKey()))
-                        .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            Map.Entry::getValue,
-                            (u, v) -> {
-                                throw new IllegalStateException(
-                                    String
-                                        .format("Duplicate key %s", u));
-                            },
-                            LinkedHashMap::new)
-                        ).values()
-                );
-            });
+            .addListener((observable, oldValue, newValue) ->
+                loadFilesByKeyword(searchInput.textProperty().getValue()));
+        TextFields.bindAutoCompletion(searchInput,
+            param -> new QueriedTags(new AllTags(db))
+                .value().values().stream()
+                .filter(tag -> param.getUserText().startsWith("#") &&
+                    tag.name().startsWith(param.getUserText().substring(1)))
+                .map(tag -> "#"+tag.name())
+                .collect(Collectors.toList()));
         loadFiles();
         fileList.setCellFactory(param -> new FileListCell());
         fileList.setOnContextMenuRequested(event -> {
-            final ContextMenu menu = new ContextMenu();
-            menu.show(fileList, event.getScreenX(), event.getScreenY());
+
         });
         fileList.setItems(data);
         fileList.getSelectionModel().selectedItemProperty()
@@ -172,24 +154,54 @@ public class FileList implements Initializable {
         });
     }
 
+    private void loadFilesByKeyword(String keyword) {
+        data.clear();
+        data.addAll(
+            new FsFiles(root)
+                .value().entrySet().stream()
+                .filter(
+                    entry -> entry.getKey().contains(keyword) ||
+                        new QueriedAFiles(
+                            new FilesByInput(db, keyword))
+                            .value()
+                            .containsKey(entry.getKey()))
+                .collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    Map.Entry::getValue,
+                    (u, v) -> {
+                        throw new IllegalStateException(
+                            String
+                                .format("Duplicate key %s", u));
+                    },
+                    LinkedHashMap::new)
+                ).values()
+        );
+    }
+
     private ContextMenu fileContextMenu(ResourceBundle res) {
         final ContextMenu menu = new ContextMenu();
+        final MenuItem favorite = new MenuItem(res.getString("favorite"));
+        favorite.setOnAction(event -> {
+            new MarkFavorite(db, new FileByName(db,
+                fileList.getSelectionModel().getSelectedItem().getName())
+                .value().id()).fire();
+        });
+        menu.getItems().add(favorite);
         final MenuItem rename = new MenuItem(res.getString("rename"));
         rename.setOnAction(event -> {
-            final File selected =
-                fileList.getSelectionModel().getSelectedItem();
+            final File select = fileList.getSelectionModel().getSelectedItem();
             final TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle(selected.getName());
+            dialog.setTitle(select.getName());
             dialog.setHeaderText(res.getString("rename"));
             dialog.setContentText(res.getString("new_name"));
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(newName -> {
                 try {
-                    final File target = new File(selected.getParent(), newName);
-                    Files.move(selected.toPath(), target.toPath());
+                    final File target = new File(select.getParent(), newName);
+                    Files.move(select.toPath(), target.toPath());
                     new FileRenameAction(
                         db,
-                        new FileByName(db, selected.getName()).value(),
+                        new FileByName(db, select.getName()).value(),
                         newName
                     ).fire();
                     loadInfo(target, res);
