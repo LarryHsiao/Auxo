@@ -8,7 +8,6 @@ import com.larryhsiao.auxo.workspace.FsFiles;
 import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -35,6 +34,7 @@ import java.util.stream.Collectors;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
+import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.scene.input.KeyCode.ENTER;
 import static javafx.scene.input.MouseButton.PRIMARY;
 import static javafx.scene.input.TransferMode.COPY;
@@ -45,8 +45,7 @@ import static javafx.scene.input.TransferMode.COPY;
 public class FileList implements Initializable {
     private final File root;
     private final Source<Connection> db;
-    private final ObservableList<File> data =
-        FXCollections.observableArrayList();
+    private final ObservableList<File> data = observableArrayList();
     @FXML private TextField searchInput;
     @FXML private ListView<File> fileList;
     @FXML private AnchorPane info;
@@ -66,12 +65,19 @@ public class FileList implements Initializable {
                 .value().values().stream()
                 .filter(tag -> param.getUserText().startsWith("#") &&
                     tag.name().startsWith(param.getUserText().substring(1)))
-                .map(tag -> "#"+tag.name())
+                .map(tag -> "#" + tag.name())
                 .collect(Collectors.toList()));
         loadFiles();
         fileList.setCellFactory(param -> new FileListCell());
+        fileList.setContextMenu(new ContextMenu());
         fileList.setOnContextMenuRequested(event -> {
-
+            fileList.getContextMenu().getItems().clear();
+            fileList.getContextMenu().getItems().addAll(
+                fileContextMenu(resources, new QueriedTags(new TagsByFileId(db,
+                    new FileByName(db,
+                        fileList.getSelectionModel().getSelectedItem()
+                            .getName()).value().id()
+                )).value().containsKey("favorite")).getItems());
         });
         fileList.setItems(data);
         fileList.getSelectionModel().selectedItemProperty()
@@ -139,7 +145,6 @@ public class FileList implements Initializable {
                 });
             }
         });
-        fileList.setContextMenu(fileContextMenu(resources));
 
         Platform.runLater(() -> {
             final Window window = fileList.getScene().getWindow();
@@ -178,15 +183,31 @@ public class FileList implements Initializable {
         );
     }
 
-    private ContextMenu fileContextMenu(ResourceBundle res) {
+    private ContextMenu fileContextMenu(ResourceBundle res, boolean isFav) {
         final ContextMenu menu = new ContextMenu();
-        final MenuItem favorite = new MenuItem(res.getString("favorite"));
-        favorite.setOnAction(event -> {
-            new MarkFavorite(db, new FileByName(db,
-                fileList.getSelectionModel().getSelectedItem().getName())
-                .value().id()).fire();
-        });
-        menu.getItems().add(favorite);
+        if (isFav) {
+            final File selected =
+                fileList.getSelectionModel().getSelectedItem();
+            final MenuItem favorite = new MenuItem(
+                res.getString("remove_from_favorite"));
+            favorite.setOnAction(event -> {
+                new UnMarkFavorite(db,
+                    new FileByName(db, selected.getName()).value().id()).fire();
+                loadInfo(selected, res);
+            });
+            menu.getItems().add(favorite);
+        } else {
+            final File selected =
+                fileList.getSelectionModel().getSelectedItem();
+            final MenuItem favorite = new MenuItem(res.getString("favorite"));
+            favorite.setOnAction(event -> {
+                new MarkFavorite(db,
+                    new FileByName(db, selected.getName()).value().id()).fire();
+                loadInfo(selected, res);
+            });
+            menu.getItems().add(favorite);
+            loadInfo(selected, res);
+        }
         final MenuItem rename = new MenuItem(res.getString("rename"));
         rename.setOnAction(event -> {
             final File select = fileList.getSelectionModel().getSelectedItem();
@@ -282,6 +303,7 @@ public class FileList implements Initializable {
                     });
                 }
                 watchKey.reset();
+                Thread.sleep(1000);
             }
         }
     }
