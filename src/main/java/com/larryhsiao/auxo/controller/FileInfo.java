@@ -98,13 +98,12 @@ public class FileInfo implements Initializable {
                 }
             }
         });
-        TextFields.bindAutoCompletion(newTagInput, param -> new QueriedTags(
-            new TagsByKeyword(
-                db, param.getUserText()
-            )
-        ).value().values().stream()
-         .filter(tag -> !tagMap.containsKey(tag.name()))
-         .collect(Collectors.toList()), new TagStringConverter(db));
+        TextFields.bindAutoCompletion(newTagInput, param ->
+            new QueriedTags(new TagsByKeyword(db, param.getUserText()))
+                .value()
+                .values().stream()
+                .filter(tag -> !tagMap.containsKey(tag.name()))
+                .collect(Collectors.toList()), new TagStringConverter(db));
 
         final File fsFile = new File(
             root,

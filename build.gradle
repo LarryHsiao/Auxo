@@ -36,7 +36,7 @@ test {
 }
 
 dependencies {
-    implementation('com.larryhsiao:juno:1.0.9') {
+    implementation('com.larryhsiao:juno:1.1.2') {
         exclude group: 'com.h2database'
     }
     implementation 'com.h2database:h2:1.4.199'

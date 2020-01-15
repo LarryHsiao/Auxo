@@ -1,13 +1,15 @@
-package com.larryhsiao.auxo.controller;
+package com.larryhsiao.auxo.controller.devices;
 
 import com.google.gson.JsonObject;
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
+import com.silverhetch.clotho.Source;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
+import org.takes.facets.fork.FkMethods;
 import org.takes.facets.fork.FkRegex;
 import org.takes.facets.fork.TkFork;
 import org.takes.http.FtBasic;
@@ -16,6 +18,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.net.*;
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -26,13 +29,15 @@ import java.util.ResourceBundle;
 public class Devices implements Initializable, Closeable {
     private static final int PORT_DISCOVERING = 24000;
     private static final int PORT_API = 24001;
+    private final Source<Connection> db;
     private final File root;
     private boolean running = true;
     private DatagramSocket socket = null;
     private Map<String, Target> targetData = new HashMap<>();
     @FXML private ListView<Target> listView;
 
-    public Devices(File root) {
+    public Devices(Source<Connection> db, File root) {
+        this.db = db;
         this.root = root;
     }
 
@@ -63,7 +68,10 @@ public class Devices implements Initializable, Closeable {
                 try {
                     new FtBasic(
                         new TkFork(
-                            new FkRegex(".*", new TkFiles(root))
+                            new FkRegex(".+", new TkFork(
+                                new FkMethods("GET", new TkFiles(db, root)),
+                                new FkMethods("HEAD", new TkFileHeads(root))
+                            ))
                         ), PORT_API
                     ).start(() -> !running);
                 } catch (IOException e) {
