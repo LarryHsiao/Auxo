@@ -6,6 +6,7 @@ import com.larryhsiao.auxo.utils.FileMimeType;
 import com.larryhsiao.auxo.utils.PlatformExecute;
 import com.larryhsiao.auxo.utils.SingleMediaPlayer;
 import com.larryhsiao.auxo.views.FileListCell;
+import com.silverhetch.clotho.file.FileText;
 import com.silverhetch.clotho.utility.comparator.StringComparator;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -18,6 +19,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import org.fxmisc.richtext.StyledTextArea;
+import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,8 +64,10 @@ public class FileBrowse implements Initializable {
                         loadImage(newValue, resources);
                     } else if (mimeType.startsWith("video")) {
                         loadMedia(newValue, resources);
+                    } else if (mimeType.startsWith("text")) {
+                        loadText(newValue, resources);
                     }
-                }catch (IOException e){
+                } catch (IOException e) {
                     contents.getChildren().clear();
                 }
             });
@@ -72,6 +77,20 @@ public class FileBrowse implements Initializable {
                 openSelectedFile(resources);
             }
         });
+    }
+
+    private void loadText(File fsFile, ResourceBundle resources) {
+        StyledTextArea<String, Boolean> area = new StyledTextArea<>(
+            "", (t, s) -> {
+        }, false, (t, s) -> {
+        }, new SimpleEditableStyledDocument<>("", false), true
+        );
+        area.setWrapText(true);
+        area.setPrefSize(500.0, 300.0);
+        area.insertText(0, new FileText(fsFile).value());
+        contents.getChildren().clear();
+        contents.getChildren().add(area);
+        VBox.setVgrow(contents, ALWAYS);
     }
 
     private void openSelectedFile(ResourceBundle res) {
@@ -88,6 +107,7 @@ public class FileBrowse implements Initializable {
             }).start();
         }
     }
+
     private void loadMedia(File fsFile, ResourceBundle res) throws IOException {
         final FXMLLoader loader = new FXMLLoader(
             getClass().getResource("/com/larryhsiao/auxo/video_player.fxml"),
