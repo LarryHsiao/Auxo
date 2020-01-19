@@ -7,6 +7,7 @@ import com.larryhsiao.auxo.views.TagListCell;
 import com.larryhsiao.auxo.views.TagStringConverter;
 import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
+import com.silverhetch.clotho.file.FileText;
 import com.silverhetch.clotho.file.IsImage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -25,6 +26,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.controlsfx.control.textfield.TextFields;
+import org.fxmisc.richtext.StyledTextArea;
+import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
 
 import java.io.File;
 import java.io.IOException;
@@ -123,6 +126,8 @@ public class FileInfo implements Initializable {
             } else if (mimeType.startsWith("video") ||
                 mimeType.startsWith("audio")) {
                 loadMedia(fsFile, resources);
+            } else if (mimeType.startsWith("text")) {
+                loadText(fsFile, resources);
             } else {
                 VBox.setVgrow(tagList, ALWAYS);
             }
@@ -130,6 +135,20 @@ public class FileInfo implements Initializable {
             e.printStackTrace();
             VBox.setVgrow(tagList, ALWAYS);
         }
+    }
+
+    private void loadText(File fsFile, ResourceBundle res) {
+        StyledTextArea<String, Boolean> area = new StyledTextArea<>(
+            "", (t, s) -> {
+        }, false, (t, s) -> {
+        }, new SimpleEditableStyledDocument<>("", false), true
+        );
+        area.setPrefSize(400.0, 500.0);
+        area.insertText(0, new FileText(fsFile).value());
+        area.setWrapText(true);
+        contents.getChildren().clear();
+        contents.getChildren().add(area);
+        VBox.setVgrow(contents, ALWAYS);
     }
 
     private void loadMedia(File fsFile, ResourceBundle res) throws IOException {

@@ -39,6 +39,7 @@ dependencies {
     implementation('com.larryhsiao:juno:1.1.2') {
         exclude group: 'com.h2database'
     }
+    implementation 'org.fxmisc.richtext:richtextfx:0.10.3'
     implementation 'com.h2database:h2:1.4.199'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'org.xerial:sqlite-jdbc:3.23.1'
