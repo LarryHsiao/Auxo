@@ -1,7 +1,11 @@
 package com.larryhsiao.auxo.controller;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.larryhsiao.auxo.controller.devices.Devices;
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
 import com.silverhetch.clotho.Source;
+import com.silverhetch.clotho.file.TextFile;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -10,14 +14,21 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.sql.Connection;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.ResourceBundle;
 
+import static java.util.Locale.US;
 import static javafx.scene.input.MouseEvent.MOUSE_PRESSED;
 import static javafx.stage.StageStyle.UNDECORATED;
 
@@ -38,6 +49,7 @@ public class Main implements Initializable, Closeable {
     @FXML private Button devices;
     @FXML private Button about;
     @FXML private AnchorPane content;
+    @FXML private Button nyxImport;
 
     public Main(File root, Source<Connection> db) {
         this.root = root;
@@ -56,7 +68,61 @@ public class Main implements Initializable, Closeable {
         devices.setOnAction(event -> loadDevices(res));
         about.setOnAction(event -> loadAbout(res));
         about.setText(res.getString("about"));
+        nyxImport.setText("Nyx import");
+        nyxImport.setOnAction(event -> {
+            try {
+                var client = new OkHttpClient();
+                var response = client.newCall(new Request.Builder()
+                    .url("http://192.168.0.101:8080/diaries")
+                    .build()
+                ).execute();
+                var array = JsonParser.parseString(
+                    response.body().string()
+                ).getAsJsonArray();
+                for (int i = 0; i < array.size(); i++) {
+                    var obj = array.get(i).getAsJsonObject();
+                    var content = obj.get("title").getAsString();
+                    var formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm", US);
+                    var date = new Date();
+                    date.setTime(obj.get("time").getAsLong());
+                    var dir = new File(root, formatter.format(date));
+//                    if (dir.exists()){
+//                        continue;
+//                    }
+                    dir.mkdir();
+                    new TextFile(
+                        new File(dir, "content.txt"), content).value();
+                    System.out.println("" + formatter.format(date));
+                    System.out.println(content);
+                    for (JsonElement attach : obj.get("attachments")
+                        .getAsJsonArray()) {
+                        var attachment = attach.getAsString();
+                        loadAttachment(dir, attachment);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
         loadFileList(res);
+    }
+
+    private void loadAttachment(File dir, String attachment)
+        throws IOException {
+        var client = new OkHttpClient();
+        var res = client.newCall(new Request.Builder()
+            .url(HttpUrl.parse("http://192.168.0.101:8080/files/")
+            .newBuilder()
+                .addPathSegment(attachment)
+                .build())
+            .build())
+            .execute();
+        String fileName;
+        if (attachment.startsWith("geo")){
+            new File(dir, attachment).createNewFile();
+        }else {
+            Files.write(new File(dir,attachment+".jpeg" ).toPath(), res.body().bytes());
+        }
     }
 
     private void loadAbout(ResourceBundle res) {
@@ -89,11 +155,10 @@ public class Main implements Initializable, Closeable {
             }
             tearDownCurrentController(res);
             currentPage = PAGE_DEVICES;
-            FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/com/larryhsiao/auxo/devices.fxml"),
-                res
-            );
-            currentPageController = new Devices(root);
+            final FXMLLoader loader = new FXMLLoader(
+                getClass().getResource(
+                    "/com/larryhsiao/auxo/devices/devices.fxml"), res);
+            currentPageController = new Devices(db, root);
             loader.setController(currentPageController);
             Parent parent = loader.load();
             content.getChildren().clear();

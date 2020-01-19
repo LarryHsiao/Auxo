@@ -35,8 +35,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 //        final File root = FileSystems.getDefault().getPath(".").toFile();
-        final File root =
-            new File("/home/larryhsiao/Dropbox/Elizabeth/MediaSamples/");
+        final File root = new File("/home/larryhsiao/Dropbox/Elizabeth/temp");
         db = new SingleConn(new TagDbConn(root));
         moveToH2();
         new CleanUpFiles(
@@ -70,7 +69,7 @@ public class Main extends Application {
         });
         var screens = Screen.getScreens();
         if (screens.size() >= 2) {
-            final Rectangle2D bounds = screens.get(1).getVisualBounds();
+            final Rectangle2D bounds = screens.get(0).getVisualBounds();
             stage.setX(bounds.getMinX() + 100);
             stage.setY(bounds.getMinY() + 100);
         }

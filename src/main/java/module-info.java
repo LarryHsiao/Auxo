@@ -13,7 +13,9 @@ module auxo {
     requires juno;
     requires takes;
     requires com.google.gson;
+    requires okhttp3;
 
     opens com.larryhsiao.auxo.controller to javafx.fxml;
+    opens com.larryhsiao.auxo.controller.devices to javafx.fxml;
     exports com.larryhsiao.auxo;
 }
