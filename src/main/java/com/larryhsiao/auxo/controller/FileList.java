@@ -3,6 +3,7 @@ package com.larryhsiao.auxo.controller;
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.utils.AuxoExecute;
 import com.larryhsiao.auxo.utils.ImageToFile;
+import com.larryhsiao.auxo.utils.PlatformExecute;
 import com.larryhsiao.auxo.views.FileListCell;
 import com.larryhsiao.auxo.workspace.FsFiles;
 import com.larryhsiao.juno.*;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 import static javafx.collections.FXCollections.observableArrayList;
+import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.input.KeyCode.ENTER;
 import static javafx.scene.input.MouseButton.PRIMARY;
 import static javafx.scene.input.TransferMode.COPY;
@@ -185,6 +187,43 @@ public class FileList implements Initializable {
 
     private ContextMenu fileContextMenu(ResourceBundle res, boolean isFav) {
         final ContextMenu menu = new ContextMenu();
+        final Menu createMenu = new Menu(res.getString("create"));
+        final MenuItem folder = new MenuItem(res.getString("folder"));
+        folder.setOnAction(event -> {
+            final var dialog = new TextInputDialog();
+            dialog.setContentText(res.getString("folder_name"));
+            var option = dialog.showAndWait();
+            option.ifPresent(s -> {
+                var success = new File(root, s).mkdir();
+                if (!success) {
+                    var alert = new Alert(ERROR);
+                    alert.setContentText(res.getString("create_file_failed"));
+                    alert.show();
+                }
+            });
+        });
+        createMenu.getItems().add(folder);
+        final MenuItem file = new MenuItem(res.getString("file"));
+        file.setOnAction(event -> {
+            final var dialog = new TextInputDialog();
+            dialog.setContentText(res.getString("file_name"));
+            var option = dialog.showAndWait();
+            option.ifPresent(s -> {
+                try {
+                    var success = new File(root, s).createNewFile();
+                    if (!success) {
+                        var alert = new Alert(ERROR);
+                        alert.setContentText(
+                            res.getString("create_file_failed"));
+                        alert.show();
+                    }
+                }catch (IOException e){
+                    new ExceptionAlert(e, res).fire();
+                }
+            });
+        });
+        createMenu.getItems().add(file);
+        menu.getItems().add(createMenu);
         if (isFav) {
             final File selected =
                 fileList.getSelectionModel().getSelectedItem();
@@ -254,6 +293,14 @@ public class FileList implements Initializable {
             }
         });
         menu.getItems().add(delete);
+        final MenuItem showInBrowser = new MenuItem(
+            res.getString("show_in_browser"));
+        showInBrowser.setOnAction(event -> {
+            new Thread(() -> new PlatformExecute(
+                fileList.getSelectionModel().getSelectedItem().getParentFile()
+            ).fire()).start();
+        });
+        menu.getItems().add(showInBrowser);
         return menu;
     }
 
