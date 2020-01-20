@@ -1,5 +1,6 @@
 package com.larryhsiao.auxo;
 
+import com.jfoenix.controls.JFXDecorator;
 import com.larryhsiao.auxo.workspace.FsFiles;
 import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
@@ -16,12 +17,13 @@ import javafx.stage.Stage;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Entry point of Auxo.
@@ -35,9 +37,11 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        final File root = FileSystems.getDefault().getPath(".").toFile();
+//        final File root = FileSystems.getDefault().getPath(".").toFile();
 //        final File root =
 //            new File("/home/larryhsiao/Dropbox/Elizabeth/MediaSamples/");
+        final File root =
+            new File("/home/larryhsiao/Dropbox/carpo_nyx/");
         db = new SingleConn(new TagDbConn(root));
         moveToH2();
         new CleanUpFiles(
@@ -52,12 +56,31 @@ public class Main extends Application {
             ResourceBundle.getBundle("i18n/default")
         );
         loader.setController(new com.larryhsiao.auxo.controller.Main(root, db));
-        Scene scene = new Scene(loader.load());
-        scene.getStylesheets().add(
-            getClass().getResource("/stylesheet/default.css").toExternalForm()
+        var decorator = new JFXDecorator(stage, loader.load());
+        decorator.setPrefWidth(1280);
+        decorator.setPrefHeight(720);
+        var scene = new Scene(decorator);
+        scene.getStylesheets().addAll(
+            getClass().getResource("/stylesheet/General.css").toExternalForm(),
+            requireNonNull(getClass().getClassLoader()
+                .getResource("com/jfoenix/assets/css/jfoenix-design.css"))
+                .toExternalForm(),
+            requireNonNull(getClass().getClassLoader()
+                .getResource("com/jfoenix/assets/css/jfoenix-fonts.css"))
+                .toExternalForm(),
+            getClass().getResource("/stylesheet/default.css").toExternalForm(),
+            getClass().getResource("/stylesheet/Button.css").toExternalForm(),
+            getClass().getResource("/stylesheet/Decorator.css")
+                .toExternalForm(),
+            getClass().getResource("/stylesheet/ListView.css").toExternalForm(),
+            getClass().getResource("/stylesheet/SplitPane.css")
+                .toExternalForm(),
+            getClass().getResource("/stylesheet/TextField.css")
+                .toExternalForm(),
+            getClass().getResource("/stylesheet/ToggleButton.css")
+                .toExternalForm(),
+            getClass().getResource("/stylesheet/ToolBar.css").toExternalForm()
         );
-        stage.setMinWidth(1280);
-        stage.setMinHeight(900);
         stage.setTitle(root.getAbsolutePath());
         stage.setScene(scene);
         stage.setOnCloseRequest(event -> {

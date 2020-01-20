@@ -1,0 +1,17 @@
+.jfx-tool-bar {
+    -fx-font-size: 20;
+    -fx-font-weight: BOLD;
+    -fx-background-color: -fx-color-primary;
+    -fx-pref-width: 100%;
+    -fx-pref-height: 64.0px;
+}
+
+.jfx-tool-bar Label {
+    -fx-text-fill: -fx-color-text-on-plat;
+}
+
+.jfx-tool-bar HBox {
+    -fx-alignment: center;
+    -fx-spacing: 25.0;
+    -fx-padding: 0.0 10.0;
+}

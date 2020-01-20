@@ -1,0 +1,14 @@
+.jfx-text-field, .jfx-password-field, .jfx-text-area {
+    -fx-background-color: transparent;
+    -fx-font-weight: BOLD;
+    -fx-prompt-text-fill: -fx-color-secondary-text;
+    -fx-alignment: top-left;
+    -fx-max-width: 300.0;
+    -fx-pref-width: 300.0;
+    -jfx-focus-color: -fx-color-primary;
+    -jfx-unfocus-color: -fx-color-divider;
+}
+
+.jfx-text-area .viewport {
+    -fx-background-color: transparent;
+}
