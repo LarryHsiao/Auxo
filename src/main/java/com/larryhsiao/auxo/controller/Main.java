@@ -9,7 +9,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
 import javafx.stage.Stage;
 
 import java.io.Closeable;
@@ -20,6 +24,8 @@ import java.sql.Connection;
 import java.util.ResourceBundle;
 
 import static javafx.scene.input.MouseEvent.MOUSE_PRESSED;
+import static javafx.scene.layout.BackgroundRepeat.NO_REPEAT;
+import static javafx.scene.layout.BackgroundSize.DEFAULT;
 import static javafx.stage.StageStyle.UNDECORATED;
 
 /**
@@ -47,14 +53,36 @@ public class Main implements Initializable, Closeable {
 
     @Override
     public void initialize(URL location, ResourceBundle res) {
-        tagManagement.setText(res.getString("tag_management"));
+        tagManagement
+            .setBackground(new Background(new BackgroundImage(new Image(
+                getClass().getResource("/images/tag.png").toExternalForm()),
+                NO_REPEAT, NO_REPEAT,
+                BackgroundPosition.DEFAULT, DEFAULT)));
+        tagManagement.setPrefHeight(45);
+        tagManagement.setMaxWidth(45);
         tagManagement.setOnAction(event -> loadTagManagement(res));
-        fileManagement.setText(res.getString("file_management"));
+        fileManagement
+            .setBackground(new Background(new BackgroundImage(new Image(
+                getClass().getResource("/images/file.png").toExternalForm()),
+                NO_REPEAT, NO_REPEAT,
+                BackgroundPosition.DEFAULT, DEFAULT)));
+        fileManagement.setPrefHeight(45);
+        fileManagement.setMaxWidth(45);
         fileManagement.setOnAction(event -> loadFileList(res));
         loadFileList(res);
-        fileManagement.setOnAction(event -> loadFileList(res));
-        devices.setText(res.getString("devices"));
+        devices.setBackground(new Background(new BackgroundImage(new Image(
+                getClass().getResource("/images/devices.png").toExternalForm()),
+                NO_REPEAT, NO_REPEAT,
+                BackgroundPosition.DEFAULT, DEFAULT)));
+        devices.setPrefHeight(45);
+        devices.setMaxWidth(45);
         devices.setOnAction(event -> loadDevices(res));
+        about.setBackground(new Background(new BackgroundImage(new Image(
+            getClass().getResource("/images/about.png").toExternalForm()),
+            NO_REPEAT, NO_REPEAT,
+            BackgroundPosition.DEFAULT, DEFAULT)));
+        about.setPrefHeight(45);
+        about.setMaxWidth(45);
         about.setOnAction(event -> loadAbout(res));
         about.setText(res.getString("about"));
         loadFileList(res);
