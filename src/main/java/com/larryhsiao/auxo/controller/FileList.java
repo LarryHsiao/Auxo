@@ -8,6 +8,7 @@ import com.larryhsiao.auxo.views.FileListCell;
 import com.larryhsiao.auxo.workspace.FsFiles;
 import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
+import com.silverhetch.clotho.file.FileDelete;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -189,6 +190,7 @@ public class FileList implements Initializable {
     }
 
     private ContextMenu fileContextMenu(ResourceBundle res, boolean isFav) {
+        final File selected = fileList.getSelectionModel().getSelectedItem();
         final ContextMenu menu = new ContextMenu();
         final Menu createMenu = new Menu(res.getString("create"));
         final MenuItem folder = new MenuItem(res.getString("folder"));
@@ -228,8 +230,6 @@ public class FileList implements Initializable {
         createMenu.getItems().add(file);
         menu.getItems().add(createMenu);
         if (isFav) {
-            final File selected =
-                fileList.getSelectionModel().getSelectedItem();
             final MenuItem favorite = new MenuItem(
                 res.getString("remove_from_favorite"));
             favorite.setOnAction(event -> {
@@ -239,8 +239,6 @@ public class FileList implements Initializable {
             });
             menu.getItems().add(favorite);
         } else {
-            final File selected =
-                fileList.getSelectionModel().getSelectedItem();
             final MenuItem favorite = new MenuItem(res.getString("favorite"));
             favorite.setOnAction(event -> {
                 new MarkFavorite(db,
@@ -252,21 +250,15 @@ public class FileList implements Initializable {
         }
         final MenuItem rename = new MenuItem(res.getString("rename"));
         rename.setOnAction(event -> {
-            final File select = fileList.getSelectionModel().getSelectedItem();
             final TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle(select.getName());
+            dialog.setTitle(selected.getName());
             dialog.setHeaderText(res.getString("rename"));
             dialog.setContentText(res.getString("new_name"));
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(newName -> {
                 try {
-                    final File target = new File(select.getParent(), newName);
-                    Files.move(select.toPath(), target.toPath());
-                    new FileRenameAction(
-                        db,
-                        new FileByName(db, select.getName()).value(),
-                        newName
-                    ).fire();
+                    File target = new File(selected.getParent(), newName);
+                    renameTo(selected, target);
                     loadInfo(target, res);
                 } catch (IOException e) {
                     new ExceptionAlert(e, res).fire();
@@ -277,8 +269,7 @@ public class FileList implements Initializable {
         final MenuItem delete = new MenuItem(res.getString("delete"));
         delete.setOnAction(event -> {
             final Stage current = ((Stage) fileList.getScene().getWindow());
-            final File selected =
-                fileList.getSelectionModel().getSelectedItem();
+
             final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle(selected.getName());
             alert.setContentText(MessageFormat
@@ -288,7 +279,8 @@ public class FileList implements Initializable {
             alert.setY(current.getY() + 150);
             final Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                if (!selected.delete()) {
+                new FileDelete(selected).fire();
+                if (selected.exists()) {
                     new ExceptionAlert(
                         new Exception(
                             "Failed to delete " + selected.getName()),
@@ -300,7 +292,6 @@ public class FileList implements Initializable {
         final MenuItem showInBrowser = new MenuItem(
             res.getString("show_in_browser"));
         showInBrowser.setOnAction(event -> {
-            File selected = fileList.getSelectionModel().getSelectedItem();
             File target;
             if (selected.isDirectory()) {
                 target = selected;
@@ -310,7 +301,41 @@ public class FileList implements Initializable {
             new Thread(() -> new PlatformExecute(target).fire()).start();
         });
         menu.getItems().add(showInBrowser);
+        if (selected.isFile()) {
+            final MenuItem wrapIntoFolder = new MenuItem(
+                res.getString("wrap_into_folder")
+            );
+            wrapIntoFolder.setOnAction(event -> {
+                try {
+                    final var tempTarget = new File(root, selected.getName() + ".tmp");
+                    renameTo(selected, tempTarget);
+                    final var targetDir = new File(root, selected.getName());
+                    targetDir.mkdir();
+                    new FileRenameAction(
+                        db,
+                        new FileByName(db, tempTarget.getName()).value(),
+                        selected.getName()
+                    ).fire();
+                    Files.move(tempTarget.toPath(), new File(
+                        targetDir,
+                        selected.getName()
+                    ).toPath());
+                } catch (Exception e) {
+                    new ExceptionAlert(e, res).fire();
+                }
+            });
+            menu.getItems().add(wrapIntoFolder);
+        }
         return menu;
+    }
+
+    private void renameTo(File file, File target) throws IOException {
+        Files.move(file.toPath(), target.toPath());
+        new FileRenameAction(
+            db,
+            new FileByName(db, file.getName()).value(),
+            target.getName()
+        ).fire();
     }
 
     private void moveFileIntoWorkspace(File file) throws IOException {

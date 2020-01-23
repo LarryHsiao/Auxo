@@ -25,11 +25,13 @@ import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import static javafx.scene.input.MouseButton.PRIMARY;
+import static javafx.scene.input.TransferMode.COPY;
 import static javafx.scene.layout.Priority.ALWAYS;
 
 /**
@@ -75,6 +77,30 @@ public class FileBrowse implements Initializable {
         listView.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 openSelectedFile(resources);
+            }
+        });
+        listView.setOnDragOver(event -> {
+            if (event.getDragboard().hasFiles() ||
+                event.getDragboard().hasImage()) {
+                event.acceptTransferModes(COPY);
+            }
+            event.consume();
+        });
+        listView.setOnDragDropped(event -> {
+            var board = event.getDragboard();
+            if (board.hasFiles()){
+                for (var file:board.getFiles()){
+                    new Thread(()->{
+                        try{
+                            Files.move(file.toPath(), new File(
+                                root,
+                                file.getName()
+                            ).toPath());
+                        }catch (IOException e){
+                            new ExceptionAlert(e, resources).fire();
+                        }
+                    }).start();
+                }
             }
         });
     }
