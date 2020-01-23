@@ -46,8 +46,7 @@ import static javafx.scene.layout.Priority.ALWAYS;
 public class FileInfo implements Initializable {
     private final File root;
     private final long fileId;
-    private final ObservableList<Tag> tags =
-        FXCollections.observableArrayList();
+    private final ObservableList<Tag> tags = FXCollections.observableArrayList();
     private final Map<String, Tag> tagMap = new HashMap<>();
     private final Source<Connection> db;
     @FXML private TextArea fileName;

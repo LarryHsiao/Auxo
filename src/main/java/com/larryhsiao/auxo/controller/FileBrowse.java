@@ -40,6 +40,7 @@ import static javafx.scene.layout.Priority.ALWAYS;
 public class FileBrowse implements Initializable {
     private final File root;
     private final File target;
+    private File dirFile;
     @FXML private ListView<File> listView;
     @FXML private AnchorPane contents;
 
@@ -80,8 +81,7 @@ public class FileBrowse implements Initializable {
             }
         });
         listView.setOnDragOver(event -> {
-            if (event.getDragboard().hasFiles() ||
-                event.getDragboard().hasImage()) {
+            if (event.getDragboard().hasFiles()) {
                 event.acceptTransferModes(COPY);
             }
             event.consume();
@@ -93,7 +93,7 @@ public class FileBrowse implements Initializable {
                     new Thread(()->{
                         try{
                             Files.move(file.toPath(), new File(
-                                root,
+                                dirFile,
                                 file.getName()
                             ).toPath());
                         }catch (IOException e){
@@ -160,6 +160,7 @@ public class FileBrowse implements Initializable {
 
     private void loadDirectory(File dir) {
         try {
+            dirFile = dir;
             listView.getItems().clear();
             if (!dir.getCanonicalPath().equals(target.getCanonicalPath())) {
                 listView.getItems().add(new File(dir, ".."));

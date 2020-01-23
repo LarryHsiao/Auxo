@@ -34,8 +34,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
+import static java.nio.file.StandardWatchEventKinds.*;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.input.KeyCode.ENTER;
@@ -49,12 +48,9 @@ public class FileList implements Initializable {
     private final File root;
     private final Source<Connection> db;
     private final ObservableList<File> data = observableArrayList();
-    @FXML
-    private TextField searchInput;
-    @FXML
-    private ListView<File> fileList;
-    @FXML
-    private AnchorPane info;
+    @FXML private TextField searchInput;
+    @FXML private ListView<File> fileList;
+    @FXML private AnchorPane info;
 
     public FileList(File root, Source<Connection> db) {
         this.root = root;
@@ -156,7 +152,7 @@ public class FileList implements Initializable {
             final Window window = fileList.getScene().getWindow();
             new Thread(() -> {
                 try {
-                    listenForFileChange(window);
+                    listenForFileChange(window, resources);
                 } catch (IOException | InterruptedException e) {
                     Platform.runLater(
                         () -> new ExceptionAlert(e, resources).fire());
@@ -350,12 +346,13 @@ public class FileList implements Initializable {
         data.addAll(new FsFiles(root).value().values());
     }
 
-    private void listenForFileChange(Window window)
+    private void listenForFileChange(Window window, ResourceBundle res)
         throws IOException, InterruptedException {
         try (final WatchService watchService = FileSystems.getDefault()
             .newWatchService()) {
             final WatchKey watchKey = root.toPath()
                 .register(watchService, ENTRY_CREATE,
+                    ENTRY_MODIFY,
                     ENTRY_DELETE);
             final AtomicBoolean running = new AtomicBoolean(true);
             window.setOnHidden(event -> running.set(false));
@@ -370,7 +367,7 @@ public class FileList implements Initializable {
                         if (event.kind() == ENTRY_CREATE) {
                             data.add(
                                 new File(root, changed.toFile().getName()));
-                        } else {
+                        } else if (event.kind() == ENTRY_DELETE) {
                             var deleted =
                                 new File(root, changed.toFile().getName())
                                     .getAbsolutePath();
@@ -380,6 +377,11 @@ public class FileList implements Initializable {
                                     break;
                                 }
                             }
+                        }else if (event.kind() == ENTRY_MODIFY){
+                            loadInfo(
+                                fileList.getSelectionModel().getSelectedItem(),
+                                res
+                            );
                         }
                     });
                 }
