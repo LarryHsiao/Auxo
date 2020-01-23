@@ -16,10 +16,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -49,11 +46,10 @@ import static javafx.scene.layout.Priority.ALWAYS;
 public class FileInfo implements Initializable {
     private final File root;
     private final long fileId;
-    private final ObservableList<Tag> tags =
-        FXCollections.observableArrayList();
+    private final ObservableList<Tag> tags = FXCollections.observableArrayList();
     private final Map<String, Tag> tagMap = new HashMap<>();
     private final Source<Connection> db;
-    @FXML private TextField fileName;
+    @FXML private TextArea fileName;
     @FXML private ListView<Tag> tagList;
     @FXML private TextField newTagInput;
     @FXML private AnchorPane contents;

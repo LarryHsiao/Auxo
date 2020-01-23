@@ -14,22 +14,30 @@ import java.util.ResourceBundle;
  * Controller for About page
  */
 public class About implements Initializable {
-    @FXML private VBox infoVBox;
+    @FXML
+    private VBox infoVBox;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        infoVBox.getChildren().add(fileTypeAttribution());
+        infoVBox.getChildren().add(lines(
+            "Icon made by prettycons from www.flaticon.com",
+            "https://www.flaticon.com/authors/prettycons"
+        ));
+        infoVBox.getChildren().add(lines(
+            "Source code",
+            "https://github.com/LarryHsiao/Auxo"
+        ));
     }
 
-    private Node fileTypeAttribution() {
+    private Node lines(String text, String url) {
         var link = new Hyperlink();
-        link.setText("Icon made by prettycons from www.flaticon.com");
+        link.setText(text);
         link.setOnAction(event -> {
             new Thread(() -> {
                 try {
                     Desktop.getDesktop()
                         .browse(new URL(
-                            "https://www.flaticon.com/authors/prettycons")
+                            url)
                             .toURI());
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -10,7 +10,7 @@
       prefWidth="640"
       prefHeight="480"
       xmlns:fx="http://javafx.com/fxml">
-    <TextField fx:id="fileName" editable="false"/>
+    <TextArea fx:id="fileName" maxHeight="100" editable="false" wrapText="true"/>
     <AnchorPane fx:id="contents" VBox.vgrow="ALWAYS"/>
     <TextField fx:id="newTagInput"/>
     <ListView fx:id="tagList" prefHeight="400"/>

@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -37,11 +38,11 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-//        final File root = FileSystems.getDefault().getPath(".").toFile();
+        final File root = FileSystems.getDefault().getPath(".").toFile();
 //        final File root =
 //            new File("/home/larryhsiao/Dropbox/Elizabeth/MediaSamples/");
-        final File root =
-            new File("/home/larryhsiao/Dropbox/carpo_nyx/");
+//        final File root =
+//            new File("/home/larryhsiao/Dropbox/carpo_nyx/");
         db = new SingleConn(new TagDbConn(root));
         moveToH2();
         new CleanUpFiles(
@@ -94,7 +95,7 @@ public class Main extends Application {
         });
         var screens = Screen.getScreens();
         if (screens.size() >= 2) {
-            final Rectangle2D bounds = screens.get(1).getVisualBounds();
+            final Rectangle2D bounds = screens.get(0).getVisualBounds();
             stage.setX(bounds.getMinX() + 100);
             stage.setY(bounds.getMinY() + 100);
         }
