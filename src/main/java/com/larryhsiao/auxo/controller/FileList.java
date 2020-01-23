@@ -48,9 +48,12 @@ public class FileList implements Initializable {
     private final File root;
     private final Source<Connection> db;
     private final ObservableList<File> data = observableArrayList();
-    @FXML private TextField searchInput;
-    @FXML private ListView<File> fileList;
-    @FXML private AnchorPane info;
+    @FXML
+    private TextField searchInput;
+    @FXML
+    private ListView<File> fileList;
+    @FXML
+    private AnchorPane info;
 
     public FileList(File root, Source<Connection> db) {
         this.root = root;
@@ -217,7 +220,7 @@ public class FileList implements Initializable {
                             res.getString("create_file_failed"));
                         alert.show();
                     }
-                }catch (IOException e){
+                } catch (IOException e) {
                     new ExceptionAlert(e, res).fire();
                 }
             });
@@ -287,7 +290,8 @@ public class FileList implements Initializable {
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 if (!selected.delete()) {
                     new ExceptionAlert(
-                        new Exception("Failed to delete " + selected.getName()),
+                        new Exception(
+                            "Failed to delete " + selected.getName()),
                         res).fire();
                 }
             }
@@ -296,9 +300,14 @@ public class FileList implements Initializable {
         final MenuItem showInBrowser = new MenuItem(
             res.getString("show_in_browser"));
         showInBrowser.setOnAction(event -> {
-            new Thread(() -> new PlatformExecute(
-                fileList.getSelectionModel().getSelectedItem().getParentFile()
-            ).fire()).start();
+            File selected = fileList.getSelectionModel().getSelectedItem();
+            File target;
+            if (selected.isDirectory()) {
+                target = selected;
+            } else {
+                target = selected.getParentFile();
+            }
+            new Thread(() -> new PlatformExecute(target).fire()).start();
         });
         menu.getItems().add(showInBrowser);
         return menu;
