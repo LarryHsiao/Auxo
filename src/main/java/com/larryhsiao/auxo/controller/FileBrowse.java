@@ -1,10 +1,7 @@
 package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
-import com.larryhsiao.auxo.utils.FileComparator;
-import com.larryhsiao.auxo.utils.FileMimeType;
-import com.larryhsiao.auxo.utils.PlatformExecute;
-import com.larryhsiao.auxo.utils.SingleMediaPlayer;
+import com.larryhsiao.auxo.utils.*;
 import com.larryhsiao.auxo.views.FileListCell;
 import com.silverhetch.clotho.file.FileText;
 import com.silverhetch.clotho.utility.comparator.StringComparator;
@@ -13,7 +10,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -41,8 +41,10 @@ public class FileBrowse implements Initializable {
     private final File root;
     private final File target;
     private File dirFile;
-    @FXML private ListView<File> listView;
-    @FXML private AnchorPane contents;
+    @FXML
+    private ListView<File> listView;
+    @FXML
+    private AnchorPane contents;
 
     public FileBrowse(File root, File target) {
         this.root = root;
@@ -75,6 +77,7 @@ public class FileBrowse implements Initializable {
                 }
             });
 
+        listView.setContextMenu(contextMenu(resources));
         listView.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 openSelectedFile(resources);
@@ -88,21 +91,40 @@ public class FileBrowse implements Initializable {
         });
         listView.setOnDragDropped(event -> {
             var board = event.getDragboard();
-            if (board.hasFiles()){
-                for (var file:board.getFiles()){
-                    new Thread(()->{
-                        try{
+            if (board.hasFiles()) {
+                for (var file : board.getFiles()) {
+                    new Thread(() -> {
+                        try {
                             Files.move(file.toPath(), new File(
                                 dirFile,
                                 file.getName()
                             ).toPath());
-                        }catch (IOException e){
+                        } catch (IOException e) {
                             new ExceptionAlert(e, resources).fire();
                         }
                     }).start();
                 }
             }
         });
+    }
+
+    private ContextMenu contextMenu(ResourceBundle res) {
+        final ContextMenu menu = new ContextMenu();
+        final MenuItem createFile = new MenuItem();
+        createFile.setText(res.getString("create_file"));
+        createFile.setGraphic(new MenuIcon("/images/file.png").value());
+        createFile.setOnAction(event -> {
+            try {
+                var result = new TextInputDialog("").showAndWait();
+                if (result.isPresent()) {
+                    new File(target, result.get()).createNewFile();
+                }
+            } catch (IOException e) {
+                new ExceptionAlert(e, res).fire();
+            }
+        });
+        menu.getItems().add(createFile);
+        return menu;
     }
 
     private void loadText(File fsFile, ResourceBundle resources) {

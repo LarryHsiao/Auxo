@@ -3,6 +3,7 @@ package com.larryhsiao.auxo.controller;
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.utils.AuxoExecute;
 import com.larryhsiao.auxo.utils.ImageToFile;
+import com.larryhsiao.auxo.utils.MenuIcon;
 import com.larryhsiao.auxo.utils.PlatformExecute;
 import com.larryhsiao.auxo.views.FileListCell;
 import com.larryhsiao.auxo.workspace.FsFiles;
@@ -15,6 +16,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.Dragboard;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -48,9 +51,12 @@ public class FileList implements Initializable {
     private final File root;
     private final Source<Connection> db;
     private final ObservableList<File> data = observableArrayList();
-    @FXML private TextField searchInput;
-    @FXML private ListView<File> fileList;
-    @FXML private AnchorPane info;
+    @FXML
+    private TextField searchInput;
+    @FXML
+    private ListView<File> fileList;
+    @FXML
+    private AnchorPane info;
 
     public FileList(File root, Source<Connection> db) {
         this.root = root;
@@ -189,7 +195,9 @@ public class FileList implements Initializable {
         final File selected = fileList.getSelectionModel().getSelectedItem();
         final ContextMenu menu = new ContextMenu();
         final Menu createMenu = new Menu(res.getString("create"));
+        createMenu.setGraphic(new MenuIcon("/images/plus.png").value());
         final MenuItem folder = new MenuItem(res.getString("folder"));
+        folder.setGraphic(new MenuIcon("/images/dir.png").value());
         folder.setOnAction(event -> {
             final var dialog = new TextInputDialog();
             dialog.setContentText(res.getString("folder_name"));
@@ -205,6 +213,7 @@ public class FileList implements Initializable {
         });
         createMenu.getItems().add(folder);
         final MenuItem file = new MenuItem(res.getString("file"));
+        file.setGraphic(new MenuIcon("/images/file.png").value());
         file.setOnAction(event -> {
             final var dialog = new TextInputDialog();
             dialog.setContentText(res.getString("file_name"));
@@ -228,6 +237,7 @@ public class FileList implements Initializable {
         if (isFav) {
             final MenuItem favorite = new MenuItem(
                 res.getString("remove_from_favorite"));
+            favorite.setGraphic(new MenuIcon("/images/fav.png").value());
             favorite.setOnAction(event -> {
                 new UnMarkFavorite(db,
                     new FileByName(db, selected.getName()).value().id()).fire();
@@ -236,6 +246,7 @@ public class FileList implements Initializable {
             menu.getItems().add(favorite);
         } else {
             final MenuItem favorite = new MenuItem(res.getString("favorite"));
+            favorite.setGraphic(new MenuIcon("/images/fav.png").value());
             favorite.setOnAction(event -> {
                 new MarkFavorite(db,
                     new FileByName(db, selected.getName()).value().id()).fire();
@@ -245,6 +256,7 @@ public class FileList implements Initializable {
             loadInfo(selected, res);
         }
         final MenuItem rename = new MenuItem(res.getString("rename"));
+        rename.setGraphic(new MenuIcon("/images/rename.png").value());
         rename.setOnAction(event -> {
             final TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle(selected.getName());
@@ -263,6 +275,7 @@ public class FileList implements Initializable {
         });
         menu.getItems().add(rename);
         final MenuItem delete = new MenuItem(res.getString("delete"));
+        delete.setGraphic(new MenuIcon("/images/trash.png").value());
         delete.setOnAction(event -> {
             final Stage current = ((Stage) fileList.getScene().getWindow());
 
@@ -287,6 +300,7 @@ public class FileList implements Initializable {
         menu.getItems().add(delete);
         final MenuItem showInBrowser = new MenuItem(
             res.getString("show_in_browser"));
+        showInBrowser.setGraphic(new MenuIcon("/images/browse.png").value());
         showInBrowser.setOnAction(event -> {
             File target;
             if (selected.isDirectory()) {
@@ -301,6 +315,7 @@ public class FileList implements Initializable {
             final MenuItem wrapIntoFolder = new MenuItem(
                 res.getString("wrap_into_folder")
             );
+            wrapIntoFolder.setGraphic(new MenuIcon("/images/box_in.png").value());
             wrapIntoFolder.setOnAction(event -> {
                 try {
                     final var tempTarget = new File(root, selected.getName() + ".tmp");
@@ -377,7 +392,7 @@ public class FileList implements Initializable {
                                     break;
                                 }
                             }
-                        }else if (event.kind() == ENTRY_MODIFY){
+                        } else if (event.kind() == ENTRY_MODIFY) {
                             loadInfo(
                                 fileList.getSelectionModel().getSelectedItem(),
                                 res
