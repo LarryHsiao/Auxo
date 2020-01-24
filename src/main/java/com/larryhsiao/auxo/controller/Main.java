@@ -35,16 +35,24 @@ public class Main implements Initializable, Closeable {
     private static final int PAGE_TAG_MANAGEMENT = 1;
     private static final int PAGE_FILE_MANAGEMENT = 2;
     private static final int PAGE_DEVICES = 3;
+    private static final int PAGE_CONFIG = 4;
 
     private final File root;
     private final Source<Connection> db;
     private int currentPage = -1;
     private Object currentPageController = null;
-    @FXML private Button tagManagement;
-    @FXML private Button fileManagement;
-    @FXML private Button devices;
-    @FXML private Button about;
-    @FXML private AnchorPane content;
+    @FXML
+    private Button tagManagement;
+    @FXML
+    private Button fileManagement;
+    @FXML
+    private Button devices;
+    @FXML
+    private Button config;
+    @FXML
+    private Button about;
+    @FXML
+    private AnchorPane content;
 
     public Main(File root, Source<Connection> db) {
         this.root = root;
@@ -71,9 +79,9 @@ public class Main implements Initializable, Closeable {
         fileManagement.setOnAction(event -> loadFileList(res));
         loadFileList(res);
         devices.setBackground(new Background(new BackgroundImage(new Image(
-                getClass().getResource("/images/devices.png").toExternalForm()),
-                NO_REPEAT, NO_REPEAT,
-                BackgroundPosition.DEFAULT, DEFAULT)));
+            getClass().getResource("/images/devices.png").toExternalForm()),
+            NO_REPEAT, NO_REPEAT,
+            BackgroundPosition.DEFAULT, DEFAULT)));
         devices.setPrefHeight(45);
         devices.setMaxWidth(45);
         devices.setOnAction(event -> loadDevices(res));
@@ -85,7 +93,33 @@ public class Main implements Initializable, Closeable {
         about.setMaxWidth(45);
         about.setOnAction(event -> loadAbout(res));
         about.setText(res.getString("about"));
+        config.setBackground(new Background(new BackgroundImage(new Image(
+            getClass().getResource("/images/config.png").toExternalForm(),
+            45.0, 45.0, true, true),
+            NO_REPEAT, NO_REPEAT,
+            BackgroundPosition.DEFAULT, DEFAULT)));
+        config.setPrefHeight(45);
+        config.setMaxWidth(45);
+        config.setOnAction(event -> loadConfig(res));
         loadFileList(res);
+    }
+
+    private void loadConfig(ResourceBundle res) {
+        try {
+            if (currentPage == PAGE_CONFIG) {
+                return;
+            }
+            tearDownCurrentController(res);
+            currentPage = PAGE_CONFIG;
+            final FXMLLoader loader = new FXMLLoader(
+                getClass().getResource(
+                    "/com/larryhsiao/auxo/config.fxml"), res);
+            Parent parent = loader.load();
+            content.getChildren().clear();
+            content.getChildren().add(parent);
+        } catch (IOException e) {
+            new ExceptionAlert(e, res).fire();
+        }
     }
 
     private void loadAbout(ResourceBundle res) {
