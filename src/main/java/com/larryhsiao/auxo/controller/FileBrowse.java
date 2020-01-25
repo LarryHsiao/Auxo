@@ -3,6 +3,7 @@ package com.larryhsiao.auxo.controller;
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.utils.*;
 import com.larryhsiao.auxo.views.FileListCell;
+import com.silverhetch.clotho.file.FileDelete;
 import com.silverhetch.clotho.file.FileText;
 import com.silverhetch.clotho.utility.comparator.StringComparator;
 import javafx.application.Platform;
@@ -10,10 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -26,10 +24,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import static javafx.scene.control.ButtonType.OK;
 import static javafx.scene.input.MouseButton.PRIMARY;
 import static javafx.scene.input.TransferMode.COPY;
 import static javafx.scene.layout.Priority.ALWAYS;
@@ -78,6 +78,12 @@ public class FileBrowse implements Initializable {
             });
 
         listView.setContextMenu(contextMenu(resources));
+        listView.setOnContextMenuRequested(event -> {
+            listView.getContextMenu().getItems().clear();
+            listView.getContextMenu().getItems().addAll(
+                contextMenu(resources).getItems()
+            );
+        });
         listView.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 openSelectedFile(resources);
@@ -117,13 +123,37 @@ public class FileBrowse implements Initializable {
             try {
                 var result = new TextInputDialog("").showAndWait();
                 if (result.isPresent()) {
-                    new File(target, result.get()).createNewFile();
+                    var newFile = new File(target, result.get());
+                    newFile.createNewFile();
+                    listView.getItems().add(newFile);
                 }
             } catch (IOException e) {
                 new ExceptionAlert(e, res).fire();
             }
         });
         menu.getItems().add(createFile);
+        var selected = listView.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            final MenuItem delete = new MenuItem();
+            delete.setText(res.getString("delete"));
+            delete.setGraphic(new MenuIcon("/images/trash.png").value());
+            delete.setOnAction(event -> {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setHeaderText(selected.getName());
+                alert.setContentText(
+                    MessageFormat.format(
+                        res.getString("delete_obj"),
+                        selected.getName()
+                    )
+                );
+                var result = alert.showAndWait();
+                if (result.isPresent() && result.get() == OK) {
+                    new FileDelete(selected).fire();
+                    listView.getItems().remove(selected);
+                }
+            });
+            menu.getItems().add(delete);
+        }
         return menu;
     }
 

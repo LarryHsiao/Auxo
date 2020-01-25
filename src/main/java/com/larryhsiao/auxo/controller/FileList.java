@@ -31,10 +31,8 @@ import java.net.URL;
 import java.nio.file.*;
 import java.sql.Connection;
 import java.text.MessageFormat;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -234,6 +232,20 @@ public class FileList implements Initializable {
             });
         });
         createMenu.getItems().add(file);
+        final MenuItem nyxInstance = new MenuItem(res.getString("nyx"));
+        nyxInstance.setGraphic(new MenuIcon("/images/nyx.png").value());
+        nyxInstance.setOnAction(event -> {
+            try {
+                var format = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+                var nyxRoot = new File(root, format.format(new Date()));
+                nyxRoot.mkdir();
+                var contentFile = new File(nyxRoot, "content.txt");
+                contentFile.createNewFile();
+            }catch (IOException e){
+                new ExceptionAlert(e, res).fire();
+            }
+        });
+        createMenu.getItems().add(nyxInstance);
         menu.getItems().add(createMenu);
         if (isFav) {
             final MenuItem favorite = new MenuItem(
