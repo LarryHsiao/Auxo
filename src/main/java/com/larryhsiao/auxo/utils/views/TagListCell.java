@@ -1,4 +1,4 @@
-package com.larryhsiao.auxo.views;
+package com.larryhsiao.auxo.utils.views;
 
 import com.larryhsiao.juno.Tag;
 import javafx.scene.control.ListCell;

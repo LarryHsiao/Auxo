@@ -1,8 +1,10 @@
-package com.larryhsiao.auxo.views;
+package com.larryhsiao.auxo.utils.views;
 
+import com.larryhsiao.auxo.utils.FileTypeDetector;
 import com.silverhetch.clotho.file.Extension;
+import com.silverhetch.clotho.log.Log;
+import com.silverhetch.clotho.log.PhantomLog;
 import javafx.geometry.Pos;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.control.ListCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -11,7 +13,6 @@ import javafx.scene.layout.StackPane;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Collections;
 
 import static javafx.scene.input.TransferMode.MOVE;
@@ -20,6 +21,16 @@ import static javafx.scene.input.TransferMode.MOVE;
  * List cell that display a file.
  */
 public class FileListCell extends ListCell<File> {
+    private final Log log;
+
+    public FileListCell(Log log) {
+        this.log = log;
+    }
+
+    public FileListCell(){
+        this(new PhantomLog());
+    }
+
     @Override
     protected void updateItem(File item, boolean empty) {
         super.updateItem(item, empty);
@@ -51,9 +62,10 @@ public class FileListCell extends ListCell<File> {
 
     private Image image(File item) {
         try {
+            final String contentType = new FileTypeDetector().probeContentType(item.toPath());
+            log.debug(item.toURI().toASCIIString() + " ContentType: "+contentType);
             final String imageUrl;
-            if ("image/png".equals(Files.probeContentType(item.toPath())) ||
-                "image/jpeg".equals(Files.probeContentType(item.toPath()))) {
+            if (contentType != null && contentType.startsWith("image")) {
                 imageUrl = item.toURI().toASCIIString();
             } else if ("..".equals(item.getName())) {
                 imageUrl =

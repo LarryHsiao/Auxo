@@ -1,6 +1,11 @@
 package com.larryhsiao.auxo;
 
 import com.jfoenix.controls.JFXDecorator;
+import com.larryhsiao.auxo.config.ConfigFileSource;
+import com.larryhsiao.auxo.config.ConfigPropertiesSource;
+import com.larryhsiao.auxo.config.SetupWorkspace;
+import com.larryhsiao.auxo.config.Workspace;
+import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.workspace.FsFiles;
 import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
@@ -15,6 +20,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import okhttp3.OkHttpClient;
 
 import java.io.Closeable;
 import java.io.File;
@@ -41,7 +47,8 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         final Log log = new BeautyLog().value();
-        final File root = FileSystems.getDefault().getPath(".").toFile();
+        final OkHttpClient client = new OkHttpClient();
+        final File root = findRootFile();
 //        final File root =
 //            new File("/home/larryhsiao/Dropbox/Elizabeth/MediaSamples/");
 //        final File root =
@@ -59,7 +66,7 @@ public class Main extends Application {
 //            getClass().getResource("/com/larryhsiao/auxo/tags.fxml"),
             ResourceBundle.getBundle("i18n/default")
         );
-        loader.setController(new com.larryhsiao.auxo.controller.Main(root, db));
+        loader.setController(new com.larryhsiao.auxo.controller.Main(log, client, root, db));
         var decorator = new JFXDecorator(stage, loader.load());
         decorator.setPrefWidth(1280);
         decorator.setPrefHeight(720);
@@ -103,6 +110,16 @@ public class Main extends Application {
             stage.setY(bounds.getMinY() + 100);
         }
         stage.show();
+    }
+
+    private File findRootFile() {
+        try {
+            return new File(new Workspace(new ConfigPropertiesSource(new ConfigFileSource()),
+                FileSystems.getDefault().getPath(".").toFile().getAbsolutePath()
+            ).value());
+        } catch (Exception e) {
+            return FileSystems.getDefault().getPath(".").toFile();
+        }
     }
 
     @Override

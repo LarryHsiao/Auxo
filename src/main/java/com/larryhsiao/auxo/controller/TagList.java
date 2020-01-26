@@ -1,10 +1,11 @@
 package com.larryhsiao.auxo.controller;
 
-import com.larryhsiao.auxo.dialogs.ExceptionAlert;
+import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.utils.SingleMediaPlayer;
-import com.larryhsiao.auxo.views.TagListCell;
+import com.larryhsiao.auxo.utils.views.TagListCell;
 import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
+import com.silverhetch.clotho.log.Log;
 import com.silverhetch.clotho.utility.comparator.StringComparator;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -14,6 +15,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import okhttp3.OkHttpClient;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +35,8 @@ import static javafx.scene.control.SelectionMode.MULTIPLE;
  */
 public class TagList implements Initializable {
     private static final String MENU_ID_MERGE = "MENU_ID_MERGE";
+    private final Log log;
+    private final OkHttpClient client;
     private final File root;
     private final Source<Connection> db;
     private final ObservableList<Tag> data = observableArrayList();
@@ -40,7 +44,9 @@ public class TagList implements Initializable {
     @FXML private ListView<Tag> tagList;
     @FXML private AnchorPane files;
 
-    public TagList(File root, Source<Connection> db) {
+    public TagList(Log log, OkHttpClient client, File root, Source<Connection> db) {
+        this.log = log;
+        this.client = client;
         this.root = root;
         this.db = db;
     }
@@ -95,7 +101,7 @@ public class TagList implements Initializable {
                 resources
             );
             loader.setController(
-                new TagFiles(root,
+                new TagFiles(log, client ,root,
                     db,
                     tag.stream().mapToLong(Tag::id).toArray())
             );

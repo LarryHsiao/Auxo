@@ -1,4 +1,4 @@
-package com.larryhsiao.auxo.controller.devices;
+package com.larryhsiao.auxo.devices;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

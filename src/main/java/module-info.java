@@ -19,6 +19,5 @@ module auxo {
     requires annotations;
 
     opens com.larryhsiao.auxo.controller to javafx.fxml;
-    opens com.larryhsiao.auxo.controller.devices to javafx.fxml;
     exports com.larryhsiao.auxo;
 }

@@ -1,8 +1,7 @@
-package com.larryhsiao.auxo.views;
+package com.larryhsiao.auxo.utils.views;
 
 import com.silverhetch.clotho.Source;
 
-import java.io.File;
 import java.net.URL;
 
 /**

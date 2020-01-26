@@ -1,7 +1,9 @@
-package com.larryhsiao.auxo.controller.devices;
+package com.larryhsiao.auxo.controller;
 
 import com.google.gson.JsonObject;
-import com.larryhsiao.auxo.dialogs.ExceptionAlert;
+import com.larryhsiao.auxo.devices.TkFileHeads;
+import com.larryhsiao.auxo.devices.TkFiles;
+import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
 import com.silverhetch.clotho.Source;
 import javafx.application.Platform;
 import javafx.fxml.FXML;

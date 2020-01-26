@@ -1,4 +1,4 @@
-package com.larryhsiao.auxo.controller.devices;
+package com.larryhsiao.auxo.devices;
 
 import com.silverhetch.clotho.encryption.Base64Encode;
 import com.silverhetch.clotho.encryption.MD5;

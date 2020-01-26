@@ -4,12 +4,13 @@ import com.larryhsiao.auxo.utils.AuxoExecute;
 import com.larryhsiao.auxo.utils.FileComparator;
 import com.larryhsiao.auxo.utils.FileMimeType;
 import com.larryhsiao.auxo.utils.SingleMediaPlayer;
-import com.larryhsiao.auxo.views.FileListCell;
+import com.larryhsiao.auxo.utils.views.FileListCell;
 import com.larryhsiao.juno.DetachAction;
 import com.larryhsiao.juno.FileByName;
 import com.larryhsiao.juno.FilesByTagId;
 import com.larryhsiao.juno.QueriedAFiles;
 import com.silverhetch.clotho.Source;
+import com.silverhetch.clotho.log.Log;
 import com.silverhetch.clotho.utility.comparator.StringComparator;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,6 +23,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import okhttp3.OkHttpClient;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +39,8 @@ import static javafx.scene.input.MouseButton.PRIMARY;
  * Controller for file list that have given tag attached.
  */
 public class TagFiles implements Initializable {
+    private final Log log;
+    private final OkHttpClient client;
     private final File root;
     private final Source<Connection> db;
     private final long[] tagId;
@@ -44,8 +48,10 @@ public class TagFiles implements Initializable {
     @FXML private AnchorPane contents;
 
     public TagFiles(
-        File root, Source<Connection> db,
+        Log log, OkHttpClient client, File root, Source<Connection> db,
         long... tagId) {
+        this.log = log;
+        this.client = client;
         this.root = root;
         this.db = db;
         this.tagId = tagId;
@@ -70,7 +76,7 @@ public class TagFiles implements Initializable {
         fileList.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
                 new AuxoExecute(
-                   root, ((Stage) fileList.getScene().getWindow()),
+                    client, log, root, ((Stage) fileList.getScene().getWindow()),
                     fileList.getSelectionModel().getSelectedItem(),
                     resources
                 ).fire();
@@ -79,7 +85,7 @@ public class TagFiles implements Initializable {
         fileList.setOnKeyPressed(event -> {
             if (event.getCode() == ENTER) {
                 new AuxoExecute(
-                    root, ((Stage) fileList.getScene().getWindow()),
+                    client, log, root, ((Stage) fileList.getScene().getWindow()),
                     fileList.getSelectionModel().getSelectedItem(),
                     resources
                 ).fire();
