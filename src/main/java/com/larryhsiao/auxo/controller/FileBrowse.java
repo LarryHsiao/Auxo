@@ -1,12 +1,11 @@
 package com.larryhsiao.auxo.controller;
 
-import com.larryhsiao.auxo.dialogs.ExceptionAlert;
+import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.utils.*;
-import com.larryhsiao.auxo.views.FileListCell;
+import com.larryhsiao.auxo.utils.views.FileListCell;
 import com.silverhetch.clotho.file.FileDelete;
 import com.silverhetch.clotho.file.FileText;
 import com.silverhetch.clotho.log.Log;
-import com.silverhetch.clotho.log.PhantomLog;
 import com.silverhetch.clotho.regex.IsUrl;
 import com.silverhetch.clotho.utility.comparator.StringComparator;
 import javafx.application.Platform;

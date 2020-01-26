@@ -1,8 +1,8 @@
 package com.larryhsiao.auxo.controller;
 
-import com.larryhsiao.auxo.dialogs.ExceptionAlert;
+import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.utils.*;
-import com.larryhsiao.auxo.views.FileListCell;
+import com.larryhsiao.auxo.utils.views.FileListCell;
 import com.larryhsiao.auxo.workspace.FsFiles;
 import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
@@ -45,7 +45,7 @@ import static javafx.scene.input.TransferMode.COPY;
  * Controller of page that shows file list in Axuo.
  */
 public class FileList implements Initializable {
-    private final Log log ;
+    private final Log log;
     private final OkHttpClient client;
     private final File root;
     private final Source<Connection> db;
@@ -432,11 +432,8 @@ public class FileList implements Initializable {
                 getClass().getResource("/com/larryhsiao/auxo/file.fxml"),
                 res
             );
-            loader.setController(new FileInfo(
-                log, client, root, db,
-                    new FileByName(db, selected.getName()).value().id()
-                )
-            );
+            loader.setController(new FileInfo(log, client, root, db,
+                new FileByName(db, selected.getName()).value().id()));
             info.getChildren().clear();
             info.getChildren().add(loader.load());
         } catch (IOException e) {

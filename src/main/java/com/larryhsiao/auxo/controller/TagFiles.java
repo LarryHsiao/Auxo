@@ -4,7 +4,7 @@ import com.larryhsiao.auxo.utils.AuxoExecute;
 import com.larryhsiao.auxo.utils.FileComparator;
 import com.larryhsiao.auxo.utils.FileMimeType;
 import com.larryhsiao.auxo.utils.SingleMediaPlayer;
-import com.larryhsiao.auxo.views.FileListCell;
+import com.larryhsiao.auxo.utils.views.FileListCell;
 import com.larryhsiao.juno.DetachAction;
 import com.larryhsiao.juno.FileByName;
 import com.larryhsiao.juno.FilesByTagId;

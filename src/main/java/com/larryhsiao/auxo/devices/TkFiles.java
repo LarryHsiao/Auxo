@@ -1,4 +1,4 @@
-package com.larryhsiao.auxo.controller.devices;
+package com.larryhsiao.auxo.devices;
 
 import com.larryhsiao.auxo.workspace.FsFiles;
 import com.larryhsiao.juno.FavoriteFiles;

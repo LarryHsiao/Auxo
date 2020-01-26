@@ -1,8 +1,8 @@
 package com.larryhsiao.auxo.controller;
 
-import com.larryhsiao.auxo.dialogs.ExceptionAlert;
+import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.utils.SingleMediaPlayer;
-import com.larryhsiao.auxo.views.TagListCell;
+import com.larryhsiao.auxo.utils.views.TagListCell;
 import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.log.Log;

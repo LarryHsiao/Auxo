@@ -1,8 +1,7 @@
-package com.larryhsiao.auxo.views;
+package com.larryhsiao.auxo.utils.views;
 
 import com.larryhsiao.auxo.utils.FileTypeDetector;
 import com.silverhetch.clotho.file.Extension;
-import com.silverhetch.clotho.log.BeautyLog;
 import com.silverhetch.clotho.log.Log;
 import com.silverhetch.clotho.log.PhantomLog;
 import javafx.geometry.Pos;
@@ -14,7 +13,6 @@ import javafx.scene.layout.StackPane;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Collections;
 
 import static javafx.scene.input.TransferMode.MOVE;

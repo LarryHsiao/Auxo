@@ -1,7 +1,6 @@
 package com.larryhsiao.auxo.controller;
 
-import com.larryhsiao.auxo.controller.devices.Devices;
-import com.larryhsiao.auxo.dialogs.ExceptionAlert;
+import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.log.Log;
 import javafx.fxml.FXML;
@@ -41,10 +40,11 @@ public class Main implements Initializable, Closeable {
 
     private final Log log;
     private final OkHttpClient client;
-    private final File root;
     private final Source<Connection> db;
     private int currentPage = -1;
     private Object currentPageController = null;
+    private File root;
+
     @FXML private Button tagManagement;
     @FXML private Button fileManagement;
     @FXML private Button devices;
@@ -114,6 +114,7 @@ public class Main implements Initializable, Closeable {
             final FXMLLoader loader = new FXMLLoader(
                 getClass().getResource(
                     "/com/larryhsiao/auxo/config.fxml"), res);
+            loader.setController(new Config(log, root));
             Parent parent = loader.load();
             content.getChildren().clear();
             content.getChildren().add(parent);

@@ -1,6 +1,11 @@
 package com.larryhsiao.auxo;
 
 import com.jfoenix.controls.JFXDecorator;
+import com.larryhsiao.auxo.config.ConfigFileSource;
+import com.larryhsiao.auxo.config.ConfigPropertiesSource;
+import com.larryhsiao.auxo.config.SetupWorkspace;
+import com.larryhsiao.auxo.config.Workspace;
+import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.workspace.FsFiles;
 import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
@@ -43,7 +48,7 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception {
         final Log log = new BeautyLog().value();
         final OkHttpClient client = new OkHttpClient();
-        final File root = FileSystems.getDefault().getPath(".").toFile();
+        final File root = findRootFile();
 //        final File root =
 //            new File("/home/larryhsiao/Dropbox/Elizabeth/MediaSamples/");
 //        final File root =
@@ -106,6 +111,17 @@ public class Main extends Application {
         }
         stage.show();
     }
+
+    private File findRootFile() {
+        try {
+            return new File(new Workspace(new ConfigPropertiesSource(new ConfigFileSource()),
+                FileSystems.getDefault().getPath(".").toFile().getAbsolutePath()
+            ).value());
+        } catch (Exception e) {
+            return FileSystems.getDefault().getPath(".").toFile();
+        }
+    }
+
     @Override
     public void stop() throws Exception {
         super.stop();

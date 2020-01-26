@@ -1,4 +1,4 @@
-package com.larryhsiao.auxo.dialogs;
+package com.larryhsiao.auxo.utils.dialogs;
 
 import com.silverhetch.clotho.Action;
 import javafx.scene.control.Alert;

@@ -1,7 +1,7 @@
 package com.larryhsiao.auxo.utils;
 
 import com.larryhsiao.auxo.controller.FileBrowse;
-import com.larryhsiao.auxo.dialogs.ExceptionAlert;
+import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
 import com.silverhetch.clotho.Action;
 import com.silverhetch.clotho.log.Log;
 import javafx.application.Platform;
