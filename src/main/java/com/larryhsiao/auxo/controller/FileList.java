@@ -1,28 +1,27 @@
 package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
-import com.larryhsiao.auxo.utils.AuxoExecute;
-import com.larryhsiao.auxo.utils.ImageToFile;
-import com.larryhsiao.auxo.utils.MenuIcon;
-import com.larryhsiao.auxo.utils.PlatformExecute;
+import com.larryhsiao.auxo.utils.*;
 import com.larryhsiao.auxo.views.FileListCell;
 import com.larryhsiao.auxo.workspace.FsFiles;
 import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.file.FileDelete;
-import com.silverhetch.clotho.storage.Ceres;
+import com.silverhetch.clotho.log.Log;
+import com.silverhetch.clotho.log.PhantomLog;
+import com.silverhetch.clotho.regex.IsUrl;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import okhttp3.OkHttpClient;
 import org.controlsfx.control.textfield.TextFields;
 
 import java.io.File;
@@ -47,6 +46,7 @@ import static javafx.scene.input.TransferMode.COPY;
  * Controller of page that shows file list in Axuo.
  */
 public class FileList implements Initializable {
+    private final Log log = new PhantomLog();
     private final File root;
     private final Source<Connection> db;
     private final ObservableList<File> data = observableArrayList();
@@ -113,14 +113,20 @@ public class FileList implements Initializable {
             }
         });
         fileList.setOnDragOver(event -> {
-            if (event.getDragboard().hasFiles() ||
-                event.getDragboard().hasImage()) {
-                event.acceptTransferModes(COPY);
-            }
+            event.acceptTransferModes(COPY);
             event.consume();
         });
         fileList.setOnDragDropped(event -> {
             Dragboard board = event.getDragboard();
+
+            var textType = DataFormat.lookupMimeType("text/plain");
+            if (board.hasContent(textType) &&
+                new IsUrl(board.getContent(textType).toString(), log).value()) {
+                var url = board.getContent(textType).toString();
+                fileList.getItems()
+                    .add(new UrlFile(root, new OkHttpClient(), url).value());
+            }
+
             if (board.hasFiles()) {
                 for (File file : board.getFiles()) {
                     new Thread(() -> {
@@ -151,6 +157,7 @@ public class FileList implements Initializable {
                     ).fire();
                 });
             }
+            event.consume();
         });
 
         Platform.runLater(() -> {

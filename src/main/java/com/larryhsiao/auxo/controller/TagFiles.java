@@ -43,7 +43,9 @@ public class TagFiles implements Initializable {
     @FXML private ListView<File> fileList;
     @FXML private AnchorPane contents;
 
-    public TagFiles(File root, Source<Connection> db, long... tagId) {
+    public TagFiles(
+        File root, Source<Connection> db,
+        long... tagId) {
         this.root = root;
         this.db = db;
         this.tagId = tagId;
@@ -56,19 +58,19 @@ public class TagFiles implements Initializable {
             new QueriedAFiles(
                 new FilesByTagId(db, tagId)
             ).value().values().stream()
-             .map(aFile -> new File(
-                 root,
-                 aFile.name()
-             ))
-             .sorted(new FileComparator((o1, o2) -> new StringComparator()
-                 .compare(o2.getName(), o1.getName())))
-             .collect(Collectors.toList())
+                .map(aFile -> new File(
+                    root,
+                    aFile.name()
+                ))
+                .sorted(new FileComparator((o1, o2) -> new StringComparator()
+                    .compare(o2.getName(), o1.getName())))
+                .collect(Collectors.toList())
         );
 
         fileList.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
                 new AuxoExecute(
-                    root, ((Stage) fileList.getScene().getWindow()),
+                   root, ((Stage) fileList.getScene().getWindow()),
                     fileList.getSelectionModel().getSelectedItem(),
                     resources
                 ).fire();
@@ -90,7 +92,7 @@ public class TagFiles implements Initializable {
             fileList.getContextMenu().getItems().clear();
             if (tagId.length == 1) {
                 fileList.getContextMenu()
-                        .getItems().add(removeContext(resources));
+                    .getItems().add(removeContext(resources));
             }
         });
 
@@ -104,7 +106,7 @@ public class TagFiles implements Initializable {
                     } else if (mimeType.startsWith("video")) {
                         loadMedia(newValue, resources);
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             });

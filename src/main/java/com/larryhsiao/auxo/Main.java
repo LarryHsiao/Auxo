@@ -6,6 +6,8 @@ import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.SingleConn;
 import com.silverhetch.clotho.database.sqlite.SQLiteConn;
+import com.silverhetch.clotho.log.BeautyLog;
+import com.silverhetch.clotho.log.Log;
 import com.silverhetch.clotho.source.ConstSource;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -38,6 +40,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        final Log log = new BeautyLog().value();
         final File root = FileSystems.getDefault().getPath(".").toFile();
 //        final File root =
 //            new File("/home/larryhsiao/Dropbox/Elizabeth/MediaSamples/");

@@ -5,6 +5,9 @@ import com.larryhsiao.auxo.utils.*;
 import com.larryhsiao.auxo.views.FileListCell;
 import com.silverhetch.clotho.file.FileDelete;
 import com.silverhetch.clotho.file.FileText;
+import com.silverhetch.clotho.log.Log;
+import com.silverhetch.clotho.log.PhantomLog;
+import com.silverhetch.clotho.regex.IsUrl;
 import com.silverhetch.clotho.utility.comparator.StringComparator;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -14,9 +17,11 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import okhttp3.OkHttpClient;
 import org.fxmisc.richtext.StyledTextArea;
 import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
 
@@ -38,6 +43,8 @@ import static javafx.scene.layout.Priority.ALWAYS;
  * Controller of file browsing.
  */
 public class FileBrowse implements Initializable {
+    private final OkHttpClient client;
+    private final Log log;
     private final File root;
     private final File target;
     private File dirFile;
@@ -46,9 +53,15 @@ public class FileBrowse implements Initializable {
     @FXML
     private AnchorPane contents;
 
-    public FileBrowse(File root, File target) {
+    public FileBrowse(OkHttpClient client, Log log, File root, File target) {
+        this.client = client;
+        this.log = log;
         this.root = root;
         this.target = target;
+    }
+
+    public FileBrowse(File root, File target) {
+        this(new OkHttpClient(), new PhantomLog(), root, target);
     }
 
     @Override
@@ -90,9 +103,7 @@ public class FileBrowse implements Initializable {
             }
         });
         listView.setOnDragOver(event -> {
-            if (event.getDragboard().hasFiles()) {
-                event.acceptTransferModes(COPY);
-            }
+            event.acceptTransferModes(COPY);
             event.consume();
         });
         listView.setOnDragDropped(event -> {
@@ -110,6 +121,13 @@ public class FileBrowse implements Initializable {
                         }
                     }).start();
                 }
+            }
+            var textType = DataFormat.lookupMimeType("text/plain");
+            if (board.hasContent(textType) &&
+                new IsUrl(board.getContent(textType).toString(), log).value()) {
+                var url = board.getContent(textType).toString();
+                listView.getItems()
+                    .add(new UrlFile(target, client, url).value());
             }
         });
     }

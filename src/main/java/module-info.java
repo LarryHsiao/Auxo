@@ -15,6 +15,8 @@ module auxo {
     requires com.google.gson;
     requires richtextfx;
     requires com.jfoenix;
+    requires okhttp3;
+    requires annotations;
 
     opens com.larryhsiao.auxo.controller to javafx.fxml;
     opens com.larryhsiao.auxo.controller.devices to javafx.fxml;

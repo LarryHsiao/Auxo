@@ -4,7 +4,6 @@ import com.larryhsiao.auxo.controller.FileBrowse;
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
 import com.silverhetch.clotho.Action;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
@@ -23,7 +22,9 @@ public class AuxoExecute implements Action {
     private final File file;
     private final ResourceBundle res;
 
-    public AuxoExecute(File root, Stage currentStage, File file, ResourceBundle res) {
+    public AuxoExecute(
+        File root, Stage currentStage,
+        File file, ResourceBundle res) {
         this.root = root;
         this.currentStage = currentStage;
         this.file = file;
@@ -50,23 +51,24 @@ public class AuxoExecute implements Action {
 
     private void fileBrowse(File selected, ResourceBundle res) {
         try {
-            final FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/file_browse.fxml"), res);
+            final FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/com/larryhsiao/auxo/file_browse.fxml"),
+                res);
             loader.setController(new FileBrowse(root, selected));
             final Stage newStage = new Stage();
             newStage.setTitle(selected.getName());
             final Scene scene = new Scene(loader.load());
-            scene.getStylesheets().addAll(currentStage.getScene().getStylesheets());
+            scene.getStylesheets()
+                .addAll(currentStage.getScene().getStylesheets());
             newStage.setScene(scene);
             newStage.setX(currentStage.getX() + 100);
             newStage.setY(currentStage.getY() + 100);
-            newStage.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
-                @Override
-                public void handle(KeyEvent event) {
+            newStage.addEventHandler(KeyEvent.KEY_RELEASED,
+                event -> {
                     if (event.getCode() == KeyCode.ESCAPE) {
                         newStage.close();
                     }
-                }
-            });
+                });
             newStage.setOnHidden(event -> SingleMediaPlayer.release());
             newStage.show();
         } catch (Exception e) {
