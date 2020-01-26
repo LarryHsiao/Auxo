@@ -2,6 +2,7 @@ package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.utils.*;
+import com.larryhsiao.auxo.utils.dialogs.PopupPage;
 import com.larryhsiao.auxo.utils.views.FileListCell;
 import com.silverhetch.clotho.file.FileDelete;
 import com.silverhetch.clotho.file.FileText;
@@ -20,18 +21,23 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import okhttp3.OkHttpClient;
 import org.fxmisc.richtext.StyledTextArea;
 import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import static javafx.scene.control.ButtonType.OK;
 import static javafx.scene.input.MouseButton.PRIMARY;
@@ -47,10 +53,8 @@ public class FileBrowse implements Initializable {
     private final File root;
     private final File target;
     private File dirFile;
-    @FXML
-    private ListView<File> listView;
-    @FXML
-    private AnchorPane contents;
+    @FXML private ListView<File> listView;
+    @FXML private AnchorPane contents;
 
     public FileBrowse(OkHttpClient client, Log log, File root, File target) {
         this.client = client;
@@ -58,6 +62,7 @@ public class FileBrowse implements Initializable {
         this.root = root;
         this.target = target;
     }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         loadDirectory(target);
@@ -184,17 +189,38 @@ public class FileBrowse implements Initializable {
     }
 
     private void openSelectedFile(ResourceBundle res) {
-        final File selected = listView.getSelectionModel().getSelectedItem();
-        if (selected.isDirectory()) {
-            loadDirectory(selected);
-        } else {
-            new Thread(() -> {
-                try {
-                    new PlatformExecute(selected).fire();
-                } catch (Exception e) {
-                    Platform.runLater(() -> new ExceptionAlert(e, res).fire());
-                }
-            }).start();
+        try {
+            final File selected = listView.getSelectionModel().getSelectedItem();
+            if (selected.isDirectory()) {
+                loadDirectory(selected);
+            } else if (selected.getName().endsWith(".zip")) {
+                browseZip(res, selected);
+            } else {
+                new Thread(() -> {
+                    try {
+                        new PlatformExecute(selected).fire();
+                    } catch (Exception e) {
+                        Platform.runLater(() -> new ExceptionAlert(e, res).fire());
+                    }
+                }).start();
+            }
+        } catch (Exception e) {
+            new ExceptionAlert(e, res).fire();
+        }
+    }
+
+    private void browseZip(ResourceBundle res, File selected) {
+        try {
+            var loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/file_browse.fxml"), res);
+            loader.setController(new ZipBrowse(log, new ZipFile(selected)));
+            new PopupPage(
+                res,
+                loader.load(),
+                ((Stage) listView.getScene().getWindow()),
+                selected
+            ).fire();
+        } catch (Exception e) {
+            new ExceptionAlert(e, res).fire();
         }
     }
 
