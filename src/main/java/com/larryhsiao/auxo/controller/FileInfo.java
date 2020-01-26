@@ -9,6 +9,7 @@ import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.file.FileText;
 import com.silverhetch.clotho.file.IsImage;
+import com.silverhetch.clotho.log.Log;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -22,6 +23,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import okhttp3.OkHttpClient;
 import org.controlsfx.control.textfield.TextFields;
 import org.fxmisc.richtext.StyledTextArea;
 import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
@@ -44,6 +46,8 @@ import static javafx.scene.layout.Priority.ALWAYS;
  * Controller to show File details.
  */
 public class FileInfo implements Initializable {
+    private final Log log;
+    private final OkHttpClient client;
     private final File root;
     private final long fileId;
     private final ObservableList<Tag> tags = FXCollections.observableArrayList();
@@ -54,7 +58,9 @@ public class FileInfo implements Initializable {
     @FXML private TextField newTagInput;
     @FXML private AnchorPane contents;
 
-    public FileInfo(File root, Source<Connection> db, long fileId) {
+    public FileInfo(Log log, OkHttpClient client, File root, Source<Connection> db, long fileId) {
+        this.log = log;
+        this.client = client;
         this.root = root;
         this.fileId = fileId;
         this.db = db;
@@ -178,7 +184,7 @@ public class FileInfo implements Initializable {
                 getClass().getResource("/com/larryhsiao/auxo/file_browse.fxml"),
                 resources
             );
-            loader.setController(new FileBrowse(root, fsFile));
+            loader.setController(new FileBrowse(client, log,root,  fsFile));
             contents.getChildren().clear();
             contents.getChildren().add(loader.load());
             VBox.setVgrow(contents, ALWAYS);
@@ -192,7 +198,7 @@ public class FileInfo implements Initializable {
         final Stage currentStage = ((Stage) tagList.getScene().getWindow());
         FXMLLoader loader = new FXMLLoader(
             getClass().getResource("/com/larryhsiao/auxo/tag_files.fxml"), res);
-        loader.setController(new TagFiles(root, db, selected.id()));
+        loader.setController(new TagFiles(log, client, root, db, selected.id()));
         final Stage newStage = new Stage();
         final Scene scene = new Scene(loader.load());
         scene.getStylesheets().addAll(currentStage.getScene().getStylesheets());

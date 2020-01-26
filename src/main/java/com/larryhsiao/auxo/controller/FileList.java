@@ -8,7 +8,6 @@ import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.file.FileDelete;
 import com.silverhetch.clotho.log.Log;
-import com.silverhetch.clotho.log.PhantomLog;
 import com.silverhetch.clotho.regex.IsUrl;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -46,7 +45,8 @@ import static javafx.scene.input.TransferMode.COPY;
  * Controller of page that shows file list in Axuo.
  */
 public class FileList implements Initializable {
-    private final Log log = new PhantomLog();
+    private final Log log ;
+    private final OkHttpClient client;
     private final File root;
     private final Source<Connection> db;
     private final ObservableList<File> data = observableArrayList();
@@ -57,7 +57,9 @@ public class FileList implements Initializable {
     @FXML
     private AnchorPane info;
 
-    public FileList(File root, Source<Connection> db) {
+    public FileList(Log log, OkHttpClient client, File root, Source<Connection> db) {
+        this.log = log;
+        this.client = client;
         this.root = root;
         this.db = db;
     }
@@ -75,7 +77,7 @@ public class FileList implements Initializable {
                 .map(tag -> "#" + tag.name())
                 .collect(Collectors.toList()));
         loadFiles();
-        fileList.setCellFactory(param -> new FileListCell());
+        fileList.setCellFactory(param -> new FileListCell(log));
         fileList.setContextMenu(new ContextMenu());
         fileList.setOnContextMenuRequested(event -> {
             fileList.getContextMenu().getItems().clear();
@@ -97,7 +99,7 @@ public class FileList implements Initializable {
         fileList.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2 && event.getButton() == PRIMARY) {
                 new AuxoExecute(
-                    root, ((Stage) fileList.getScene().getWindow()),
+                    client, log, root, ((Stage) fileList.getScene().getWindow()),
                     fileList.getSelectionModel().getSelectedItem(),
                     resources
                 ).fire();
@@ -106,7 +108,7 @@ public class FileList implements Initializable {
         fileList.setOnKeyPressed(event -> {
             if (event.getCode() == ENTER) {
                 new AuxoExecute(
-                    root, ((Stage) fileList.getScene().getWindow()),
+                    client, log, root, ((Stage) fileList.getScene().getWindow()),
                     fileList.getSelectionModel().getSelectedItem(),
                     resources
                 ).fire();
@@ -120,13 +122,6 @@ public class FileList implements Initializable {
             Dragboard board = event.getDragboard();
 
             var textType = DataFormat.lookupMimeType("text/plain");
-            if (board.hasContent(textType) &&
-                new IsUrl(board.getContent(textType).toString(), log).value()) {
-                var url = board.getContent(textType).toString();
-                fileList.getItems()
-                    .add(new UrlFile(root, new OkHttpClient(), url).value());
-            }
-
             if (board.hasFiles()) {
                 for (File file : board.getFiles()) {
                     new Thread(() -> {
@@ -137,9 +132,8 @@ public class FileList implements Initializable {
                         }
                     }).start();
                 }
-            }
-
-            if (board.hasImage()) {
+                event.consume();
+            } else if (board.hasImage()) {
                 TextInputDialog dialog = new TextInputDialog("");
                 dialog.setHeaderText(resources.getString("image_name"));
                 dialog.getEditor().textProperty()
@@ -156,6 +150,12 @@ public class FileList implements Initializable {
                         board.getImage()
                     ).fire();
                 });
+            } else if (board.hasContent(textType) &&
+                new IsUrl(board.getContent(textType).toString(), log).value()) {
+                var url = board.getContent(textType).toString();
+                new UrlFile(root, new OkHttpClient(), url).value();
+                event.consume();
+                return;
             }
             event.consume();
         });
@@ -248,7 +248,7 @@ public class FileList implements Initializable {
                 nyxRoot.mkdir();
                 var contentFile = new File(nyxRoot, "content.txt");
                 contentFile.createNewFile();
-            }catch (IOException e){
+            } catch (IOException e) {
                 new ExceptionAlert(e, res).fire();
             }
         });
@@ -433,7 +433,7 @@ public class FileList implements Initializable {
                 res
             );
             loader.setController(new FileInfo(
-                    root, db,
+                log, client, root, db,
                     new FileByName(db, selected.getName()).value().id()
                 )
             );

@@ -3,12 +3,14 @@ package com.larryhsiao.auxo.utils;
 import com.larryhsiao.auxo.controller.FileBrowse;
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
 import com.silverhetch.clotho.Action;
+import com.silverhetch.clotho.log.Log;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import okhttp3.OkHttpClient;
 
 import java.io.File;
 import java.util.ResourceBundle;
@@ -17,14 +19,18 @@ import java.util.ResourceBundle;
  * Open given file.
  */
 public class AuxoExecute implements Action {
+    private final OkHttpClient client;
+    private final Log log;
     private final File root;
     private final Stage currentStage;
     private final File file;
     private final ResourceBundle res;
 
     public AuxoExecute(
-        File root, Stage currentStage,
+        OkHttpClient client, Log log, File root, Stage currentStage,
         File file, ResourceBundle res) {
+        this.client = client;
+        this.log = log;
         this.root = root;
         this.currentStage = currentStage;
         this.file = file;
@@ -54,7 +60,7 @@ public class AuxoExecute implements Action {
             final FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/com/larryhsiao/auxo/file_browse.fxml"),
                 res);
-            loader.setController(new FileBrowse(root, selected));
+            loader.setController(new FileBrowse(client, log, root, selected));
             final Stage newStage = new Stage();
             newStage.setTitle(selected.getName());
             final Scene scene = new Scene(loader.load());

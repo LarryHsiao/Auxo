@@ -21,7 +21,7 @@ public class FileMimeType implements Source<String> {
     @Override
     public String value() {
         try {
-            final String mimeType = Files.probeContentType(file.toPath());
+            final String mimeType = new FileTypeDetector().probeContentType(file.toPath());
             if (mimeType == null || mimeType.isEmpty()) {
                 return "application/octet-stream";
             }

@@ -59,11 +59,6 @@ public class FileBrowse implements Initializable {
         this.root = root;
         this.target = target;
     }
-
-    public FileBrowse(File root, File target) {
-        this(new OkHttpClient(), new PhantomLog(), root, target);
-    }
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         loadDirectory(target);
@@ -72,7 +67,7 @@ public class FileBrowse implements Initializable {
                 openSelectedFile(resources);
             }
         });
-        listView.setCellFactory(param -> new FileListCell());
+        listView.setCellFactory(param -> new FileListCell(log));
         listView.getSelectionModel().selectedItemProperty().addListener(
             (observable, oldValue, newValue) -> {
                 try {

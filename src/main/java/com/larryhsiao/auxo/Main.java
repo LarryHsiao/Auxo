@@ -15,6 +15,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import okhttp3.OkHttpClient;
 
 import java.io.Closeable;
 import java.io.File;
@@ -41,6 +42,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         final Log log = new BeautyLog().value();
+        final OkHttpClient client = new OkHttpClient();
         final File root = FileSystems.getDefault().getPath(".").toFile();
 //        final File root =
 //            new File("/home/larryhsiao/Dropbox/Elizabeth/MediaSamples/");
@@ -59,7 +61,7 @@ public class Main extends Application {
 //            getClass().getResource("/com/larryhsiao/auxo/tags.fxml"),
             ResourceBundle.getBundle("i18n/default")
         );
-        loader.setController(new com.larryhsiao.auxo.controller.Main(root, db));
+        loader.setController(new com.larryhsiao.auxo.controller.Main(log, client, root, db));
         var decorator = new JFXDecorator(stage, loader.load());
         decorator.setPrefWidth(1280);
         decorator.setPrefHeight(720);
@@ -104,7 +106,6 @@ public class Main extends Application {
         }
         stage.show();
     }
-
     @Override
     public void stop() throws Exception {
         super.stop();

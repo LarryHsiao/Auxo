@@ -3,6 +3,7 @@ package com.larryhsiao.auxo.controller;
 import com.larryhsiao.auxo.controller.devices.Devices;
 import com.larryhsiao.auxo.dialogs.ExceptionAlert;
 import com.silverhetch.clotho.Source;
+import com.silverhetch.clotho.log.Log;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -15,6 +16,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.stage.Stage;
+import okhttp3.OkHttpClient;
 
 import java.io.Closeable;
 import java.io.File;
@@ -37,24 +39,22 @@ public class Main implements Initializable, Closeable {
     private static final int PAGE_DEVICES = 3;
     private static final int PAGE_CONFIG = 4;
 
+    private final Log log;
+    private final OkHttpClient client;
     private final File root;
     private final Source<Connection> db;
     private int currentPage = -1;
     private Object currentPageController = null;
-    @FXML
-    private Button tagManagement;
-    @FXML
-    private Button fileManagement;
-    @FXML
-    private Button devices;
-    @FXML
-    private Button config;
-    @FXML
-    private Button about;
-    @FXML
-    private AnchorPane content;
+    @FXML private Button tagManagement;
+    @FXML private Button fileManagement;
+    @FXML private Button devices;
+    @FXML private Button config;
+    @FXML private Button about;
+    @FXML private AnchorPane content;
 
-    public Main(File root, Source<Connection> db) {
+    public Main(Log log, OkHttpClient client, File root, Source<Connection> db) {
+        this.log = log;
+        this.client = client;
         this.root = root;
         this.db = db;
     }
@@ -177,7 +177,7 @@ public class Main implements Initializable, Closeable {
                 getClass().getResource("/com/larryhsiao/auxo/file_list.fxml"),
                 res
             );
-            loader.setController(new FileList(root, db));
+            loader.setController(new FileList(log, client, root, db));
             content.getChildren().add(loader.load());
         } catch (IOException e) {
             new ExceptionAlert(e, res).fire();
@@ -197,7 +197,7 @@ public class Main implements Initializable, Closeable {
                 getClass().getResource("/com/larryhsiao/auxo/tags.fxml"),
                 res
             );
-            loader.setController(new TagList(root, db));
+            loader.setController(new TagList(log, client, root, db));
             content.getChildren().add(loader.load());
         } catch (IOException e) {
             new ExceptionAlert(e, res).fire();
@@ -205,7 +205,7 @@ public class Main implements Initializable, Closeable {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         tearDownCurrentController(null);
     }
 

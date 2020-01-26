@@ -1,5 +1,6 @@
 package com.larryhsiao.auxo.views;
 
+import com.larryhsiao.auxo.utils.FileTypeDetector;
 import com.silverhetch.clotho.file.Extension;
 import com.silverhetch.clotho.log.BeautyLog;
 import com.silverhetch.clotho.log.Log;
@@ -63,7 +64,7 @@ public class FileListCell extends ListCell<File> {
 
     private Image image(File item) {
         try {
-            final String contentType = Files.probeContentType(item.toPath());
+            final String contentType = new FileTypeDetector().probeContentType(item.toPath());
             log.debug(item.toURI().toASCIIString() + " ContentType: "+contentType);
             final String imageUrl;
             if (contentType != null && contentType.startsWith("image")) {
