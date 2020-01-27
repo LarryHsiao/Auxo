@@ -74,19 +74,19 @@ public class FileBrowse implements Initializable {
         listView.setCellFactory(param -> new FileListCell(log));
         listView.getSelectionModel().selectedItemProperty().addListener(
             (observable, oldValue, newValue) -> {
-                try {
-                    final String mimeType = new FileMimeType(newValue).value();
+//                try {
+//                    final String mimeType = new FileMimeType(newValue).value();
                     SingleMediaPlayer.release();
-                    if (mimeType.startsWith("image")) {
-                        loadImage(newValue, resources);
-                    } else if (mimeType.startsWith("video")) {
-                        loadMedia(newValue, resources);
-                    } else if (mimeType.startsWith("text")) {
-                        loadText(newValue, resources);
-                    }
-                } catch (IOException e) {
-                    contents.getChildren().clear();
-                }
+//                    if (mimeType.startsWith("image")) {
+//                        loadImage(newValue, resources);
+//                    } else if (mimeType.startsWith("video")) {
+//                        loadMedia(newValue, resources);
+//                    } else if (mimeType.startsWith("text")) {
+//                        loadText(newValue, resources);
+//                    }
+//                } catch (IOException e) {
+//                    contents.getChildren().clear();
+//                }
             });
 
         listView.setContextMenu(contextMenu(resources));

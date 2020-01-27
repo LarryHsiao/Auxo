@@ -1,7 +1,9 @@
 package com.larryhsiao.auxo.utils;
 
 import com.larryhsiao.auxo.controller.FileBrowse;
+import com.larryhsiao.auxo.controller.ZipBrowse;
 import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
+import com.larryhsiao.auxo.utils.dialogs.PopupPage;
 import com.silverhetch.clotho.Action;
 import com.silverhetch.clotho.log.Log;
 import javafx.application.Platform;
@@ -14,6 +16,7 @@ import okhttp3.OkHttpClient;
 
 import java.io.File;
 import java.util.ResourceBundle;
+import java.util.zip.ZipFile;
 
 /**
  * Open given file.
@@ -44,6 +47,8 @@ public class AuxoExecute implements Action {
         }
         if (file.isDirectory()) {
             fileBrowse(file, res);
+        } else if (file.getName().endsWith(".zip")) {
+            browseZip(res, file);
         } else {
             new Thread(() -> {
                 try {
@@ -52,6 +57,16 @@ public class AuxoExecute implements Action {
                     Platform.runLater(() -> new ExceptionAlert(e, res).fire());
                 }
             }).start();
+        }
+    }
+
+    private void browseZip(ResourceBundle res, File selected) {
+        try {
+            var loader = new FXMLLoader(getClass().getResource("/com/larryhsiao/auxo/file_browse.fxml"), res);
+            loader.setController(new ZipBrowse(log, new ZipFile(selected)));
+            new PopupPage(res, loader.load(), currentStage, selected).fire();
+        } catch (Exception e) {
+            new ExceptionAlert(e, res).fire();
         }
     }
 
