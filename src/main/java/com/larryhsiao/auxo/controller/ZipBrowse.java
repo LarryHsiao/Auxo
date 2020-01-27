@@ -45,19 +45,19 @@ public class ZipBrowse implements Initializable {
     public void initialize(URL location, ResourceBundle res) {
         listView.setCellFactory(param -> new ZipEntryCell(log, zipFile));
         listView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            try {
-                if (newValue == null) {
-                    contents.getChildren().clear();
-                    return;
-                }
-                var contentType = Files.probeContentType(
-                    Path.of(newValue));
-                if (contentType != null && contentType.startsWith("image")) {
-                    loadImage(zipFile.getEntry(newValue), res);
-                }
-            } catch (Exception e) {
-                new ExceptionAlert(e, res).fire();
-            }
+//            try {
+//                if (newValue == null) {
+//                    contents.getChildren().clear();
+//                    return;
+//                }
+//                var contentType = Files.probeContentType(
+//                    Path.of(newValue));
+//                if (contentType != null && contentType.startsWith("image")) {
+//                    loadImage(zipFile.getEntry(newValue), res);
+//                }
+//            } catch (Exception e) {
+//                new ExceptionAlert(e, res).fire();
+//            }
         });
         listView.setOnMouseClicked(event -> {
             if (event.getClickCount() >= 2 && event.getButton() == PRIMARY) {

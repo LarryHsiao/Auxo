@@ -120,16 +120,16 @@ public class FileInfo implements Initializable {
     private void loadContent(File fsFile, ResourceBundle resources) {
         try {
             SingleMediaPlayer.release();
-            final String mimeType = new FileMimeType(fsFile).value();
+//            final String mimeType = new FileMimeType(fsFile).value();
             if (fsFile.isDirectory()) {
                 loadDirectory(fsFile, resources);
-            } else if (new IsImage(fsFile).value()) {
-                loadImage(fsFile, resources);
-            } else if (mimeType.startsWith("video") ||
-                mimeType.startsWith("audio")) {
-                loadMedia(fsFile, resources);
-            } else if (mimeType.startsWith("text")) {
-                loadText(fsFile, resources);
+//            } else if (new IsImage(fsFile).value()) {
+//                loadImage(fsFile, resources);
+//            } else if (mimeType.startsWith("video") ||
+//                mimeType.startsWith("audio")) {
+//                loadMedia(fsFile, resources);
+//            } else if (mimeType.startsWith("text")) {
+//                loadText(fsFile, resources);
             } else {
                 VBox.setVgrow(tagList, ALWAYS);
             }

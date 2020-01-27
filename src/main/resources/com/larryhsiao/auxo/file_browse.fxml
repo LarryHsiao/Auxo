@@ -9,7 +9,7 @@
       AnchorPane.leftAnchor="0.0"
       AnchorPane.rightAnchor="0.0"
       xmlns:fx="http://javafx.com/fxml">
-    <AnchorPane fx:id="contents" prefWidth="300" prefHeight="300"/>
+    <AnchorPane fx:id="contents" />
     <ListView fx:id="listView"
               prefHeight="400"
               VBox.vgrow="ALWAYS"/>
