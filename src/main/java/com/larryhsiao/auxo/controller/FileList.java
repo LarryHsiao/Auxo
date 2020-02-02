@@ -174,18 +174,20 @@ public class FileList implements Initializable {
     }
 
     private void loadFilesByKeyword(String keyword) {
-        var allFiles = new QueriedAFiles(
-            new AllFiles(db)
-        ).value();
-        var dbKeywordFiles = new QueriedAFiles(
-            new FilesByInput(db, keyword))
-            .value();
+        var allFiles = new QueriedAFiles(new AllFiles(db)).value();
+        var dbKeywordFiles = new HashMap<String, AFile>();
+        var params = Arrays.stream(keyword.split(" "))
+            .filter(s -> !s.isEmpty())
+            .collect(Collectors.toList());
+        for (String param : params) {
+            dbKeywordFiles.putAll(new QueriedAFiles(new FilesByInput(db, param)).value());
+        }
         data.clear();
         data.addAll(
             new FsFiles(root)
                 .value().entrySet().stream()
                 .filter(entry -> entry.getKey().contains(keyword) ||
-                        dbKeywordFiles.containsKey(entry.getKey()) ||
+                    dbKeywordFiles.containsKey(entry.getKey()) ||
                     ("#!tag".equals(keyword) && !allFiles.containsKey(entry.getKey())))
                 .collect(Collectors.toMap(
                     Map.Entry::getKey,
