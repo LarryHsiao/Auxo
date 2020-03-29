@@ -1,15 +1,14 @@
 package com.larryhsiao.auxo.controller;
 
-import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
-import com.larryhsiao.auxo.utils.FileMimeType;
 import com.larryhsiao.auxo.utils.SingleMediaPlayer;
+import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.utils.views.TagListCell;
 import com.larryhsiao.auxo.utils.views.TagStringConverter;
 import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.file.FileText;
-import com.silverhetch.clotho.file.IsImage;
 import com.silverhetch.clotho.log.Log;
+import com.silverhetch.clotho.utility.comparator.StringComparator;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -73,17 +72,15 @@ public class FileInfo implements Initializable {
                 db,
                 newTagInput.textProperty().getValue()
             ).value();
-            new AttachAction(
-                db,
-                fileId,
-                tag.id()
-            ).fire();
+            new AttachAction(db, fileId, tag.id()).fire();
             tags.add(tag);
             tagMap.put(tag.name(), tag);
             newTagInput.setText("");
         });
         tagMap.putAll(new QueriedTags(new TagsByFileId(db, fileId)).value());
         tags.addAll(tagMap.values());
+        StringComparator comparator = new StringComparator();
+        tags.sorted((tag, t1) -> comparator.compare(tag.name(), t1.name()));
         tagList.setItems(tags);
         tagList.setCellFactory(param -> new TagListCell());
         tagList.setContextMenu(tagContextMenu(resources));
@@ -108,6 +105,7 @@ public class FileInfo implements Initializable {
                 .value()
                 .values().stream()
                 .filter(tag -> !tagMap.containsKey(tag.name()))
+                .sorted((tag, t1) -> comparator.compare(t1.name(),tag.name()))
                 .collect(Collectors.toList()), new TagStringConverter(db));
 
         final File fsFile = new File(
