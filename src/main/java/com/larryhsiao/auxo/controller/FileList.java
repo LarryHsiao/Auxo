@@ -1,7 +1,7 @@
 package com.larryhsiao.auxo.controller;
 
-import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.utils.*;
+import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.utils.views.FileListCell;
 import com.larryhsiao.auxo.workspace.FsFiles;
 import com.larryhsiao.juno.*;
@@ -399,8 +399,7 @@ public class FileList implements Initializable {
             while (running.get()) {
                 for (WatchEvent<?> event : watchKey.pollEvents()) {
                     final Path changed = (Path) event.context();
-                    if (changed.toFile().getAbsolutePath()
-                        .contains(".auxo.db")) {
+                    if (changed.toFile().getAbsolutePath().contains(".auxo.")) {
                         continue;
                     }
                     Platform.runLater(() -> {

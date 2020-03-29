@@ -16,6 +16,7 @@ import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.stage.Stage;
 import okhttp3.OkHttpClient;
+import org.controlsfx.control.StatusBar;
 
 import java.io.Closeable;
 import java.io.File;
@@ -35,7 +36,6 @@ import static javafx.stage.StageStyle.UNDECORATED;
 public class Main implements Initializable, Closeable {
     private static final int PAGE_TAG_MANAGEMENT = 1;
     private static final int PAGE_FILE_MANAGEMENT = 2;
-    private static final int PAGE_DEVICES = 3;
     private static final int PAGE_CONFIG = 4;
 
     private final Log log;
@@ -47,10 +47,10 @@ public class Main implements Initializable, Closeable {
 
     @FXML private Button tagManagement;
     @FXML private Button fileManagement;
-    @FXML private Button devices;
     @FXML private Button config;
     @FXML private Button about;
     @FXML private AnchorPane content;
+    @FXML private StatusBar statusBar;
 
     public Main(Log log, OkHttpClient client, File root, Source<Connection> db) {
         this.log = log;
@@ -78,13 +78,6 @@ public class Main implements Initializable, Closeable {
         fileManagement.setMaxWidth(45);
         fileManagement.setOnAction(event -> loadFileList(res));
         loadFileList(res);
-        devices.setBackground(new Background(new BackgroundImage(new Image(
-            getClass().getResource("/images/devices.png").toExternalForm()),
-            NO_REPEAT, NO_REPEAT,
-            BackgroundPosition.DEFAULT, DEFAULT)));
-        devices.setPrefHeight(45);
-        devices.setMaxWidth(45);
-        devices.setOnAction(event -> loadDevices(res));
         about.setBackground(new Background(new BackgroundImage(new Image(
             getClass().getResource("/images/about.png").toExternalForm()),
             NO_REPEAT, NO_REPEAT,
@@ -141,26 +134,6 @@ public class Main implements Initializable, Closeable {
                     }
                 });
             stage.showAndWait();
-        } catch (IOException e) {
-            new ExceptionAlert(e, res).fire();
-        }
-    }
-
-    private void loadDevices(ResourceBundle res) {
-        try {
-            if (currentPage == PAGE_DEVICES) {
-                return;
-            }
-            tearDownCurrentController(res);
-            currentPage = PAGE_DEVICES;
-            final FXMLLoader loader = new FXMLLoader(
-                getClass().getResource(
-                    "/com/larryhsiao/auxo/devices/devices.fxml"), res);
-            currentPageController = new Devices(db, root);
-            loader.setController(currentPageController);
-            Parent parent = loader.load();
-            content.getChildren().clear();
-            content.getChildren().add(parent);
         } catch (IOException e) {
             new ExceptionAlert(e, res).fire();
         }
