@@ -45,7 +45,7 @@ dependencies {
     implementation 'com.h2database:h2:1.4.199'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'org.xerial:sqlite-jdbc:3.23.1'
-    implementation 'com.silverhetch:clotho:1.16.2'
+    implementation 'com.silverhetch:clotho:1.17.1'
     implementation 'org.controlsfx:controlsfx:11.0.1'
     implementation group: 'org.takes', name: 'takes', version: '1.11.3'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
