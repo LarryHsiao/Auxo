@@ -2,6 +2,7 @@ package com.larryhsiao.auxo.config;
 
 import com.silverhetch.clotho.Source;
 
+import java.io.File;
 import java.util.Properties;
 
 /**
@@ -19,7 +20,7 @@ public class Workspace implements Source<String> {
     @Override
     public String value() {
         var path = source.value().getProperty("workspace");
-        if (path == null) {
+        if (path == null || !new File(path).exists()) {
             return defaultPath;
         }
         return path;
