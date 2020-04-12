@@ -2,21 +2,16 @@
 
 <?import java.lang.*?><?import java.util.*?><?import javafx.scene.*?><?import javafx.scene.control.*?><?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
-    AnchorPane.topAnchor="0.0"
-    AnchorPane.bottomAnchor="0.0"
-    AnchorPane.leftAnchor="0.0"
-    AnchorPane.rightAnchor="0.0"
-    xmlns:fx="http://javafx.com/fxml">
-    <left>
-        <VBox>
-            <TextField fx:id="searchInput" />
-            <ListView fx:id="fileList"
-                minWidth="500"
-                VBox.vgrow="ALWAYS" />
-        </VBox>
-    </left>
-    <center>
-        <AnchorPane fx:id="info" />
-    </center>
-</BorderPane>
+<HBox xmlns="http://javafx.com/javafx"
+      AnchorPane.topAnchor="0.0"
+      AnchorPane.bottomAnchor="0.0"
+      AnchorPane.leftAnchor="0.0"
+      AnchorPane.rightAnchor="0.0"
+      xmlns:fx="http://javafx.com/fxml">
+    <VBox HBox.hgrow="ALWAYS">
+        <TextField fx:id="searchInput"/>
+        <ListView fx:id="fileList"
+                  VBox.vgrow="ALWAYS"/>
+    </VBox>
+    <AnchorPane fx:id="info" prefWidth="500"/>
+</HBox>
