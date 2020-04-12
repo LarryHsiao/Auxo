@@ -51,6 +51,7 @@ public class Main implements Initializable, Closeable {
     @FXML private Button about;
     @FXML private AnchorPane content;
     @FXML private StatusBar statusBar;
+    @FXML private Button exit;
 
     public Main(Log log, OkHttpClient client, File root, Source<Connection> db) {
         this.log = log;
@@ -95,6 +96,15 @@ public class Main implements Initializable, Closeable {
         config.setMaxWidth(45);
         config.setOnAction(event -> loadConfig(res));
         loadFileList(res);
+
+        exit.setPrefHeight(45);
+        exit.setMaxWidth(45);
+        exit.setBackground(new Background(new BackgroundImage(new Image(
+            getClass().getResource("/images/power.png").toExternalForm(),
+            45.0, 45.0, true, true),
+            NO_REPEAT, NO_REPEAT,
+            BackgroundPosition.DEFAULT, DEFAULT)));
+        exit.setOnAction(actionEvent -> ((Stage) exit.getScene().getWindow()).close());
     }
 
     private void loadConfig(ResourceBundle res) {
