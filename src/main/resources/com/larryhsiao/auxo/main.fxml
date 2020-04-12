@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?><?import javafx.scene.layout.AnchorPane?><?import javafx.scene.layout.BorderPane?><?import javafx.scene.layout.VBox?><?import org.controlsfx.control.StatusBar?>
+<?import javafx.geometry.Insets?><?import javafx.scene.control.*?><?import javafx.scene.layout.*?>
 <BorderPane maxHeight="Infinity"
     maxWidth="Infinity"
     minHeight="Infinity"
@@ -9,10 +9,13 @@
     xmlns:fx="http://javafx.com/fxml/1">
     <left>
         <VBox>
+            <padding><Insets top="8" right="8" bottom="8" left="8"/></padding>
             <Button fx:id="fileManagement" />
             <Button fx:id="tagManagement" />
             <Button fx:id="config"/>
             <Button fx:id="about" />
+            <Region VBox.vgrow="ALWAYS"/>
+            <Button fx:id="exit"/>
         </VBox>
     </left>
     <center>

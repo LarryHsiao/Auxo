@@ -36,7 +36,7 @@ test {
 }
 
 dependencies {
-    implementation('com.larryhsiao:juno:1.1.2') {
+    implementation('com.larryhsiao:juno:1.1.5') {
         exclude group: 'com.h2database'
     }
     implementation("com.squareup.okhttp3:okhttp:4.3.1")

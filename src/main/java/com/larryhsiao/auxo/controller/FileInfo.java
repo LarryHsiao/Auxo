@@ -1,15 +1,14 @@
 package com.larryhsiao.auxo.controller;
 
-import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
-import com.larryhsiao.auxo.utils.FileMimeType;
 import com.larryhsiao.auxo.utils.SingleMediaPlayer;
+import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.utils.views.TagListCell;
 import com.larryhsiao.auxo.utils.views.TagStringConverter;
 import com.larryhsiao.juno.*;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.file.FileText;
-import com.silverhetch.clotho.file.IsImage;
 import com.silverhetch.clotho.log.Log;
+import com.silverhetch.clotho.utility.comparator.StringComparator;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -50,7 +49,8 @@ public class FileInfo implements Initializable {
     private final OkHttpClient client;
     private final File root;
     private final long fileId;
-    private final ObservableList<Tag> tags = FXCollections.observableArrayList();
+    private final ObservableList<Tag> tags =
+        FXCollections.observableArrayList();
     private final Map<String, Tag> tagMap = new HashMap<>();
     private final Source<Connection> db;
     @FXML private TextArea fileName;
@@ -58,7 +58,9 @@ public class FileInfo implements Initializable {
     @FXML private TextField newTagInput;
     @FXML private AnchorPane contents;
 
-    public FileInfo(Log log, OkHttpClient client, File root, Source<Connection> db, long fileId) {
+    public FileInfo(
+        Log log, OkHttpClient client, File root, Source<Connection> db,
+        long fileId) {
         this.log = log;
         this.client = client;
         this.root = root;
@@ -69,21 +71,16 @@ public class FileInfo implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         newTagInput.setOnAction(event -> {
-            final Tag tag = new TagByName(
-                db,
-                newTagInput.textProperty().getValue()
-            ).value();
-            new AttachAction(
-                db,
-                fileId,
-                tag.id()
-            ).fire();
-            tags.add(tag);
-            tagMap.put(tag.name(), tag);
+            String[] names = newTagInput.textProperty().getValue().split(" ");
+            for (String name : names) {
+                appendTag(name);
+            }
             newTagInput.setText("");
         });
         tagMap.putAll(new QueriedTags(new TagsByFileId(db, fileId)).value());
         tags.addAll(tagMap.values());
+        StringComparator comparator = new StringComparator();
+        tags.sorted((tag, t1) -> comparator.compare(tag.name(), t1.name()));
         tagList.setItems(tags);
         tagList.setCellFactory(param -> new TagListCell());
         tagList.setContextMenu(tagContextMenu(resources));
@@ -108,6 +105,7 @@ public class FileInfo implements Initializable {
                 .value()
                 .values().stream()
                 .filter(tag -> !tagMap.containsKey(tag.name()))
+                .sorted((tag, t1) -> comparator.compare(t1.name(), tag.name()))
                 .collect(Collectors.toList()), new TagStringConverter(db));
 
         final File fsFile = new File(
@@ -136,6 +134,20 @@ public class FileInfo implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
             VBox.setVgrow(tagList, ALWAYS);
+        }
+    }
+
+    private void appendTag(String name) {
+        try {
+            if (name.isEmpty()) {
+                return;
+            }
+            final Tag tag = new TagByName(db, name).value();
+            new AttachAction(db, fileId, tag.id()).fire();
+            tags.add(tag);
+            tagMap.put(tag.name(), tag);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -184,7 +196,7 @@ public class FileInfo implements Initializable {
                 getClass().getResource("/com/larryhsiao/auxo/file_browse.fxml"),
                 resources
             );
-            loader.setController(new FileBrowse(client, log,root,  fsFile));
+            loader.setController(new FileBrowse(client, log, root, fsFile));
             contents.getChildren().clear();
             contents.getChildren().add(loader.load());
             VBox.setVgrow(contents, ALWAYS);
@@ -198,7 +210,8 @@ public class FileInfo implements Initializable {
         final Stage currentStage = ((Stage) tagList.getScene().getWindow());
         FXMLLoader loader = new FXMLLoader(
             getClass().getResource("/com/larryhsiao/auxo/tag_files.fxml"), res);
-        loader.setController(new TagFiles(log, client, root, db, selected.id()));
+        loader
+            .setController(new TagFiles(log, client, root, db, selected.id()));
         final Stage newStage = new Stage();
         final Scene scene = new Scene(loader.load());
         scene.getStylesheets().addAll(currentStage.getScene().getStylesheets());
