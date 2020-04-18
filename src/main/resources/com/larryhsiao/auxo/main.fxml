@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?><?import javafx.scene.control.*?><?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?><?import javafx.scene.control.*?><?import javafx.scene.layout.*?><?import org.controlsfx.control.StatusBar?>
 <BorderPane maxHeight="Infinity"
     maxWidth="Infinity"
     minHeight="Infinity"
@@ -21,4 +21,7 @@
     <center>
         <AnchorPane fx:id="content" />
     </center>
+    <bottom >
+        <StatusBar fx:id="statusBar"/>
+    </bottom>
 </BorderPane>

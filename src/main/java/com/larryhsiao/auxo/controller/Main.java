@@ -1,14 +1,21 @@
 package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
+import com.larryhsiao.auxo.workspace.FsFiles;
+import com.larryhsiao.juno.AllFiles;
+import com.larryhsiao.juno.QueriedAFiles;
 import com.silverhetch.clotho.Source;
+import com.silverhetch.clotho.file.FileSize;
+import com.silverhetch.clotho.file.SizeText;
 import com.silverhetch.clotho.log.Log;
+import com.silverhetch.clotho.source.ConstSource;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
@@ -23,7 +30,11 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
+import java.text.MessageFormat;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import static javafx.scene.input.MouseEvent.MOUSE_PRESSED;
 import static javafx.scene.layout.BackgroundRepeat.NO_REPEAT;
@@ -53,7 +64,8 @@ public class Main implements Initializable, Closeable {
     @FXML private StatusBar statusBar;
     @FXML private Button exit;
 
-    public Main(Log log, OkHttpClient client, File root, Source<Connection> db) {
+    public Main(
+        Log log, OkHttpClient client, File root, Source<Connection> db) {
         this.log = log;
         this.client = client;
         this.root = root;
@@ -104,7 +116,51 @@ public class Main implements Initializable, Closeable {
             45.0, 45.0, true, true),
             NO_REPEAT, NO_REPEAT,
             BackgroundPosition.DEFAULT, DEFAULT)));
-        exit.setOnAction(actionEvent -> ((Stage) exit.getScene().getWindow()).close());
+        exit.setOnAction(
+            actionEvent -> ((Stage) exit.getScene().getWindow()).close());
+
+        loadStatusBar(res);
+    }
+
+    private void loadStatusBar(ResourceBundle res) {
+        statusBar.setProgress(
+            1 - ((double) root.getUsableSpace() / (double) root.getTotalSpace())
+        );
+        statusBar.setText("");
+        statusBar.getLeftItems().add(new Label(
+            MessageFormat.format(
+                res.getString("workspace_"),
+                new SizeText(new ConstSource<>(workspaceUsedSize())).value()
+            )
+        ));
+        statusBar.getRightItems().add(new Label(
+            MessageFormat.format(
+                res.getString("free_"),
+                new SizeText(new ConstSource<>(root.getFreeSpace())).value()
+            ) + " " + MessageFormat.format(
+                res.getString("total_"),
+                new SizeText(new ConstSource<>(root.getTotalSpace())).value()
+            )
+        ));
+    }
+
+    private long workspaceUsedSize() {
+        return new FsFiles(root)
+            .value().entrySet().stream()
+            .filter(entry ->
+                new QueriedAFiles(new AllFiles(db)).value()
+                    .containsKey(entry.getKey())
+            ).collect(Collectors.toMap(
+                Map.Entry::getKey,
+                Map.Entry::getValue,
+                (u, v) -> {
+                    throw new IllegalStateException(
+                        String.format("Duplicate key %s", u)
+                    );
+                }, LinkedHashMap::new)
+            ).values()
+            .stream()
+            .mapToLong(file -> new FileSize(file.toPath()).value()).sum();
     }
 
     private void loadConfig(ResourceBundle res) {
@@ -114,9 +170,9 @@ public class Main implements Initializable, Closeable {
             }
             tearDownCurrentController(res);
             currentPage = PAGE_CONFIG;
-            final FXMLLoader loader = new FXMLLoader(
-                getClass().getResource(
-                    "/com/larryhsiao/auxo/config.fxml"), res);
+            final FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                "/com/larryhsiao/auxo/config.fxml"
+            ), res);
             loader.setController(new Config(log, root));
             Parent parent = loader.load();
             content.getChildren().clear();
