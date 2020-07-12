@@ -5,6 +5,7 @@ import com.larryhsiao.auxo.utils.FileComparator;
 import com.larryhsiao.auxo.utils.FileMimeType;
 import com.larryhsiao.auxo.utils.SingleMediaPlayer;
 import com.larryhsiao.auxo.utils.views.FileListCell;
+import com.larryhsiao.auxo.workspace.FsFiles;
 import com.larryhsiao.juno.DetachAction;
 import com.larryhsiao.juno.FileByName;
 import com.larryhsiao.juno.FilesByTagId;
@@ -29,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -60,17 +62,19 @@ public class TagFiles implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         fileList.setCellFactory(param -> new FileListCell());
+        Map<String, File> value = new FsFiles(root).value();
         fileList.getItems().addAll(
             new QueriedAFiles(
                 new FilesByTagId(db, tagId)
             ).value().values().stream()
+                .filter(aFile -> value.containsKey(aFile.name()))
                 .map(aFile -> new File(
                     root,
                     aFile.name()
                 ))
-                .sorted(new FileComparator((o1, o2) -> new StringComparator()
-                    .compare(o2.getName(), o1.getName())))
-                .collect(Collectors.toList())
+                .sorted(new FileComparator((o1, o2) ->
+                    new StringComparator().compare(o2.getName(), o1.getName()))
+                ).collect(Collectors.toList())
         );
 
         fileList.setOnMouseClicked(event -> {
