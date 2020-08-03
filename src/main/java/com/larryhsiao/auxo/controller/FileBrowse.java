@@ -1,5 +1,6 @@
 package com.larryhsiao.auxo.controller;
 
+import com.larryhsiao.auxo.controller.files.BrowseFileMenuItem;
 import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.utils.*;
 import com.larryhsiao.auxo.utils.dialogs.PopupPage;
@@ -76,7 +77,7 @@ public class FileBrowse implements Initializable {
             (observable, oldValue, newValue) -> {
 //                try {
 //                    final String mimeType = new FileMimeType(newValue).value();
-                    SingleMediaPlayer.release();
+                SingleMediaPlayer.release();
 //                    if (mimeType.startsWith("image")) {
 //                        loadImage(newValue, resources);
 //                    } else if (mimeType.startsWith("video")) {
@@ -170,6 +171,7 @@ public class FileBrowse implements Initializable {
                 }
             });
             menu.getItems().add(delete);
+            menu.getItems().add(new BrowseFileMenuItem(res, selected).value());
         }
         return menu;
     }

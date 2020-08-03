@@ -1,5 +1,6 @@
 package com.larryhsiao.auxo.controller;
 
+import com.larryhsiao.auxo.controller.files.BrowseFileMenuItem;
 import com.larryhsiao.auxo.utils.*;
 import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.utils.views.FileListCell;
@@ -350,12 +351,7 @@ public class FileList implements Initializable {
             }
         });
         menu.getItems().add(delete);
-        final MenuItem showInBrowser = new MenuItem(res.getString("show_in_browser"));
-        showInBrowser.setGraphic(new MenuIcon("/images/browse.png").value());
-        showInBrowser.setOnAction(event -> {
-            new Thread(() -> new ShownInBrowser(selected).fire()).start();
-        });
-        menu.getItems().add(showInBrowser);
+        menu.getItems().add(new BrowseFileMenuItem(res, selected).value());
         if (selected.isFile()) {
             final MenuItem wrapIntoFolder = new MenuItem(
                 res.getString("wrap_into_folder")
