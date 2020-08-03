@@ -323,17 +323,10 @@ public class FileList implements Initializable {
             }
         });
         menu.getItems().add(delete);
-        final MenuItem showInBrowser = new MenuItem(
-            res.getString("show_in_browser"));
+        final MenuItem showInBrowser = new MenuItem(res.getString("show_in_browser"));
         showInBrowser.setGraphic(new MenuIcon("/images/browse.png").value());
         showInBrowser.setOnAction(event -> {
-            File target;
-            if (selected.isDirectory()) {
-                target = selected;
-            } else {
-                target = selected.getParentFile();
-            }
-            new Thread(() -> new PlatformExecute(target).fire()).start();
+            new Thread(() -> new ShownInBrowser(selected).fire()).start();
         });
         menu.getItems().add(showInBrowser);
         if (selected.isFile()) {
