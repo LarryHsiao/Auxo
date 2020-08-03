@@ -35,10 +35,7 @@ public class About implements Initializable {
         link.setOnAction(event -> {
             new Thread(() -> {
                 try {
-                    Desktop.getDesktop()
-                        .browse(new URL(
-                            url)
-                            .toURI());
+                    Desktop.getDesktop().browse(new URL(url).toURI());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

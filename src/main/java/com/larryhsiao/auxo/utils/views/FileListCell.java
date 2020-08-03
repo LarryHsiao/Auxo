@@ -83,7 +83,7 @@ public class FileListCell extends ListCell<File> {
     private Image image(File item) {
         try {
             final String contentType = new FileTypeDetector().probeContentType(item.toPath());
-            log.debug(item.toURI().toASCIIString() + " ContentType: " + contentType);
+            log.debug(item.toURI().toString() + " ContentType: " + contentType);
             final String imageUrl;
             if (contentType != null && contentType.startsWith("image")) {
                 imageUrl = item.toURI().toASCIIString();
