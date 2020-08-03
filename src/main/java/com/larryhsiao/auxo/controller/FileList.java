@@ -32,6 +32,7 @@ import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -69,13 +70,21 @@ public class FileList implements Initializable {
         searchInput.textProperty()
             .addListener((observable, oldValue, newValue) ->
                 loadFilesByKeyword(searchInput.textProperty().getValue()));
-        TextFields.bindAutoCompletion(searchInput,
-            param -> new QueriedTags(new AllTags(db))
+        TextFields.bindAutoCompletion(
+            searchInput,
+            inputView -> new QueriedTags(new AllTags(db))
                 .value().values().stream()
-                .filter(tag -> param.getUserText().startsWith("#") &&
-                    tag.name().startsWith(param.getUserText().substring(1)))
+                .filter(tag -> {
+                    String input = inputView.getUserText();
+                    String[] params = input.split(" ");
+                    if (params.length > 1) {
+                        input = params[params.length - 1];
+                    }
+                    return input.startsWith("#") && tag.name().startsWith(input.substring(1));
+                })
                 .map(tag -> "#" + tag.name())
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList())
+        );
         loadFiles();
         fileList.setCellFactory(param -> new FileListCell(log));
         fileList.setContextMenu(new ContextMenu());
@@ -179,8 +188,26 @@ public class FileList implements Initializable {
         var params = Arrays.stream(keyword.split(" "))
             .filter(s -> !s.isEmpty())
             .collect(Collectors.toList());
-        for (String param : params) {
-            dbKeywordFiles.putAll(new QueriedAFiles(new FilesByInput(db, param)).value());
+        if (params.size() > 0) {
+            dbKeywordFiles.putAll(new QueriedAFiles(new FilesByInput(db, params.get(0))).value());
+            for (String param : params.subList(1, params.size())) {
+                try {
+                    Map<String, AFile> value = new QueriedAFiles(new FilesByInput(db, param)).value();
+                    Map<String, AFile> delete = new HashMap<>();
+                    dbKeywordFiles.forEach((s, aFile) -> {
+                        if (!value.containsKey(s)) {
+                            delete.put(s, aFile);
+                        }
+                    });
+                    for (String key : delete.keySet()) {
+                        dbKeywordFiles.remove(key);
+                    }
+                } catch (Exception ignore) {
+                    dbKeywordFiles.clear(); // Second params can found nothing.
+                }
+            }
+        } else {
+            dbKeywordFiles.putAll(new QueriedAFiles(new FilesByInput(db, "")).value());
         }
         data.clear();
         data.addAll(
@@ -316,9 +343,9 @@ public class FileList implements Initializable {
                 new FileDelete(selected).fire();
                 if (selected.exists()) {
                     new ExceptionAlert(
-                        new Exception(
-                            "Failed to delete " + selected.getName()),
-                        res).fire();
+                        new Exception("Failed to delete " + selected.getName()),
+                        res
+                    ).fire();
                 }
             }
         });
