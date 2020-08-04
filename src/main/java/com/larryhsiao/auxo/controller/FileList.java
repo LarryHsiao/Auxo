@@ -1,7 +1,10 @@
 package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.controller.files.BrowseFileMenuItem;
-import com.larryhsiao.auxo.utils.*;
+import com.larryhsiao.auxo.utils.AuxoExecute;
+import com.larryhsiao.auxo.utils.ImageToFile;
+import com.larryhsiao.auxo.utils.MenuIcon;
+import com.larryhsiao.auxo.utils.UrlFile;
 import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.utils.views.FileListCell;
 import com.larryhsiao.auxo.workspace.FsFiles;
@@ -33,7 +36,6 @@ import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -83,7 +85,10 @@ public class FileList implements Initializable {
                     }
                     return input.startsWith("#") && tag.name().startsWith(input.substring(1));
                 })
-                .map(tag -> "#" + tag.name())
+                .map(tag -> {
+                    String input = inputView.getUserText();
+                    return input.substring(0, input.lastIndexOf("#")) + "#" + tag.name();
+                })
                 .collect(Collectors.toList())
         );
         loadFiles();
@@ -193,7 +198,8 @@ public class FileList implements Initializable {
             dbKeywordFiles.putAll(new QueriedAFiles(new FilesByInput(db, params.get(0))).value());
             for (String param : params.subList(1, params.size())) {
                 try {
-                    Map<String, AFile> value = new QueriedAFiles(new FilesByInput(db, param)).value();
+                    Map<String, AFile> value =
+                        new QueriedAFiles(new FilesByInput(db, param)).value();
                     Map<String, AFile> delete = new HashMap<>();
                     dbKeywordFiles.forEach((s, aFile) -> {
                         if (!value.containsKey(s)) {

@@ -18,16 +18,26 @@ public class ShownInBrowser implements Action {
     @Override
     public void fire() {
         try {
-            if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+            String osName = System.getProperty("os.name").toLowerCase();
+            if (osName.contains("windows")) {
                 new ProcessBuilder(
                     "explorer.exe",
-                    "/select,"+ file.toURI().toString()
+                    "/select," + file.toURI().toString()
                 ).start();
+            } else if (osName.contains("linux")) {
+                if (new File("/usr/bin/dolphin").exists()){
+                    new ProcessBuilder(
+                        "/usr/bin/dolphin",
+                        "--select", file.getAbsolutePath()
+                    ).start();
+                }else {
+                    throw new RuntimeException();
+                }
             } else {
                 Desktop.getDesktop().browseFileDirectory(file);
             }
         } catch (Exception e) {
-            throw new UnsupportedOperationException("Can't show file " + file.getAbsolutePath());
+            throw new UnsupportedOperationException("Can't show file " + file.getAbsolutePath(), e);
         }
     }
 }
