@@ -2,17 +2,21 @@ plugins {
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.0.8'
     id 'org.beryx.jlink' version '2.12.0'
+    id 'com.larryhsiao.thea' version '1.5.0'
 }
+
+System.out.println(thea.versionIndicator())
+def auxoVersion = thea.version().versionName()
 
 group 'com.larryhsiao'
-version '1.0-SNAPSHOT'
+version auxoVersion
 
 repositories {
-    mavenCentral()
     maven {
-        url "https://dl.bintray.com/larryhsiao/Elizabeth"
+        url = "https://larryhsiao.com:11000/repository/maven-public/"
     }
 }
+
 mainClassName = "$moduleName/com.larryhsiao.auxo.Main"
 applicationDefaultJvmArgs = [
         "--add-exports=javafx.base/com.sun.javafx.event=org.controlsfx.controls",
@@ -36,7 +40,7 @@ test {
 }
 
 dependencies {
-    implementation('com.larryhsiao:juno:1.1.5') {
+    implementation('com.larryhsiao:juno:1.2.0') {
         exclude group: 'com.h2database'
     }
     implementation("com.squareup.okhttp3:okhttp:4.3.1")
@@ -45,7 +49,7 @@ dependencies {
     implementation 'com.h2database:h2:1.4.199'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'org.xerial:sqlite-jdbc:3.23.1'
-    implementation 'com.silverhetch:clotho:1.17.1'
+    implementation 'com.larryhsiao:clotho:1.18.5'
     implementation 'org.controlsfx:controlsfx:11.0.1'
     implementation group: 'org.takes', name: 'takes', version: '1.11.3'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'

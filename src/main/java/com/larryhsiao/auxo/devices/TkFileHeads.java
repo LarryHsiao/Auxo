@@ -1,8 +1,8 @@
 package com.larryhsiao.auxo.devices;
 
-import com.silverhetch.clotho.encryption.Base64Encode;
-import com.silverhetch.clotho.encryption.MD5;
-import com.silverhetch.clotho.source.ConstSource;
+import com.larryhsiao.clotho.dgist.Base64Encode;
+import com.larryhsiao.clotho.dgist.MD5;
+import com.larryhsiao.clotho.source.ConstSource;
 import org.takes.HttpException;
 import org.takes.Request;
 import org.takes.Response;

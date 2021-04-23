@@ -2,7 +2,7 @@ package com.larryhsiao.auxo.devices;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.silverhetch.clotho.Source;
+import com.larryhsiao.clotho.Source;
 
 import java.io.File;
 import java.util.List;
