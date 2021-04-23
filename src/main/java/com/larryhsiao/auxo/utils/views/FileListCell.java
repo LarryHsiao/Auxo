@@ -1,11 +1,11 @@
 package com.larryhsiao.auxo.utils.views;
 
 import com.larryhsiao.auxo.utils.FileTypeDetector;
-import com.silverhetch.clotho.file.Extension;
-import com.silverhetch.clotho.file.FileSize;
-import com.silverhetch.clotho.file.SizeText;
-import com.silverhetch.clotho.log.Log;
-import com.silverhetch.clotho.log.PhantomLog;
+import com.larryhsiao.clotho.file.Extension;
+import com.larryhsiao.clotho.file.FileSize;
+import com.larryhsiao.clotho.file.SizeText;
+import com.larryhsiao.clotho.log.Log;
+import com.larryhsiao.clotho.log.PhantomLog;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ContentDisplay;

@@ -2,8 +2,8 @@ package com.larryhsiao.auxo.controller;
 
 import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
 import com.larryhsiao.auxo.utils.views.ZipEntryCell;
-import com.silverhetch.clotho.log.Log;
-import com.silverhetch.clotho.utility.comparator.StringComparator;
+import com.larryhsiao.clotho.log.Log;
+import com.larryhsiao.clotho.utility.comparator.StringComparator;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;

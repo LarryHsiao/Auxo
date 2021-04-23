@@ -1,8 +1,8 @@
 package com.larryhsiao.auxo.workspace;
 
 import com.larryhsiao.auxo.utils.FileComparator;
-import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.utility.comparator.StringComparator;
+import com.larryhsiao.clotho.Source;
+import com.larryhsiao.clotho.utility.comparator.StringComparator;
 
 import java.io.File;
 import java.util.Arrays;

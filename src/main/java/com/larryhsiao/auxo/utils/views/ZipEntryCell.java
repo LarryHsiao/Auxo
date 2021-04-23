@@ -1,8 +1,8 @@
 package com.larryhsiao.auxo.utils.views;
 
 import com.larryhsiao.auxo.utils.FileTypeDetector;
-import com.silverhetch.clotho.file.Extension;
-import com.silverhetch.clotho.log.Log;
+import com.larryhsiao.clotho.file.Extension;
+import com.larryhsiao.clotho.log.Log;
 import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
 import javafx.scene.image.Image;

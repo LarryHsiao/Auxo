@@ -7,7 +7,7 @@ import com.larryhsiao.auxo.config.SetupWorkspace;
 import com.larryhsiao.auxo.config.Workspace;
 import com.larryhsiao.auxo.utils.dialogs.ExceptionAlert;
 import com.larryhsiao.juno.TagDbConn;
-import com.silverhetch.clotho.log.Log;
+import com.larryhsiao.clotho.log.Log;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;

@@ -1,7 +1,7 @@
 package com.larryhsiao.auxo.config;
 
-import com.silverhetch.clotho.Action;
-import com.silverhetch.clotho.Source;
+import com.larryhsiao.clotho.Action;
+import com.larryhsiao.clotho.Source;
 
 import java.io.File;
 import java.io.FileOutputStream;

@@ -1,6 +1,6 @@
 package com.larryhsiao.auxo.utils.dialogs;
 
-import com.silverhetch.clotho.Action;
+import com.larryhsiao.clotho.Action;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
